@@ -38,6 +38,9 @@ public class Property {
     @Column(name = "pro_area")
     private Long area;
 
+    @Column(name = "pro_price")
+    private BigDecimal price;
+
     @Column(name = "pro_address")
     private String address;
 
@@ -59,11 +62,11 @@ public class Property {
 
     @ManyToOne
     @JoinColumn(name = "pro_tyc_id")
-    private TypeConcept type;
+    private TypeConcept concept;
 
     @ManyToOne
     @JoinColumn(name = "pro_prt_id")
-    private PropertyType propertyType;
+    private PropertyType type;
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL)
     private List<PropertyImage> images;

@@ -5,12 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Entity
 @Getter
@@ -24,7 +21,4 @@ public class Rol {
 
     @Column(name = "rol_name", length = 25, unique = true)
     private String rol;
-
-    @ManyToMany(mappedBy = "roles")
-    private List<User> users;
 }
