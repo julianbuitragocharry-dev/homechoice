@@ -1,7 +1,9 @@
 package com.homechoice.service;
 
+import com.homechoice.persistence.entity.property.Property;
 import com.homechoice.persistence.entity.user.Rol;
 import com.homechoice.persistence.entity.user.User;
+import com.homechoice.persistence.repository.property.PropertyRepository;
 import com.homechoice.persistence.repository.user.RolRepository;
 import com.homechoice.persistence.repository.user.UserRepository;
 import com.homechoice.presentation.dto.UserDTO;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
     private final RolRepository rolRepository;
+    private final PropertyRepository propertyRepository;
 
     public List<User> getAll() {
         return userRepository.findAll();
@@ -50,24 +53,39 @@ public class UserService {
     }
 
     public String delete(Integer id) {
+        User userToDelete = userRepository.findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException("User not found!"));
+
+        List<Property> properties = propertyRepository.findByUser(userToDelete);
+
+        for (Property property : properties) {
+            property.setUser(null);
+            propertyRepository.save(property);
+        }
+
         userRepository.deleteById(id);
         return "User deleted";
     }
 
-    private User toEntity(UserDTO userDTO) {
-        List<Rol> roles = userDTO.getRoles().stream()
-                .map(roleId -> rolRepository.findById(roleId)
-                        .orElseThrow(() -> new EntityNotFoundException("¡Rol not found!")))
-                .collect(Collectors.toList());
+    // Aux functions
 
+    private User toEntity(UserDTO userDTO) {
         return User.builder()
                 .firstName(userDTO.getFirstName())
                 .lastName(userDTO.getLastName())
                 .phone(userDTO.getPhone())
                 .address(userDTO.getAddress())
+                .nit(userDTO.getNit())
                 .email(userDTO.getEmail())
                 .password(userDTO.getPassword())
-                .roles(roles)
+                .roles(getRolesByIds(userDTO.getRoles()))
                 .build();
+    }
+
+    private List<Rol> getRolesByIds(List<Integer> roleIds) {
+        return roleIds.stream()
+                .map(roleId -> rolRepository.findById(roleId)
+                        .orElseThrow(() -> new EntityNotFoundException("¡Rol not found!")))
+                .collect(Collectors.toList());
     }
 }

@@ -1,6 +1,7 @@
 package com.homechoice.presentation.controller;
 
 import com.homechoice.persistence.entity.property.Property;
+import com.homechoice.presentation.dto.PropertyDTO;
 import com.homechoice.service.PropertyService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,8 +36,8 @@ public class PropertyController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Property save(@RequestBody Property property) {
-        return propertyService.create(property);
+    public Property save(@RequestBody PropertyDTO propertyDTO) {
+        return propertyService.create(propertyDTO);
     }
 
     @PutMapping("{id}")
@@ -47,5 +48,10 @@ public class PropertyController {
     @DeleteMapping("{id}")
     public String delete(@PathVariable Integer id) {
         return propertyService.delete(id);
+    }
+
+    @PutMapping("{propertyId}/user/{userId}")
+    public String updateUser(@PathVariable Integer propertyId, @PathVariable Integer userId) {
+        return propertyService.setUserIdForProperty(propertyId, userId);
     }
 }
