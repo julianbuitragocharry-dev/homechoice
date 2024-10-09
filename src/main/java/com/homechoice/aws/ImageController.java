@@ -28,9 +28,9 @@ public class ImageController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteFile(@RequestParam String fileUrl) {
+    public ResponseEntity<String> deleteFile(@RequestParam String path) {
         try {
-            s3Service.deleteFile(fileUrl);
+            s3Service.deleteFile(path);
             return ResponseEntity.ok("File deleted successfully.");
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

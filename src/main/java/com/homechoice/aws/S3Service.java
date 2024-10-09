@@ -8,6 +8,8 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -17,7 +19,7 @@ public class S3Service {
 
     public String uploadFile(MultipartFile file) throws IOException {
         try {
-            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket("homechoicebucket")
                     .key(fileName)
@@ -32,10 +34,9 @@ public class S3Service {
         }
     }
 
-    public void deleteFile(String fileUrl) throws IOException {
+    public void deleteFile(String path) throws IOException {
         try {
-            String fileName = fileUrl.replace("https://homechoicebucket.s3.us-east-2.amazonaws.com/", "");
-
+            String fileName = path.replace("https://homechoicebucket.s3.us-east-2.amazonaws.com/", "");
             DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
                     .bucket("homechoicebucket")
                     .key(fileName)
@@ -47,4 +48,19 @@ public class S3Service {
         }
     }
 
+    public List<String> uploadFiles(List<MultipartFile> files) throws IOException {
+        List<String> uploadPaths = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String path = uploadFile(file);
+            uploadPaths.add(path);
+        }
+        return uploadPaths;
+    }
+
+    // Function with bug
+    public void deleteFiles(List<String> paths) throws IOException {
+        for (String path : paths) {
+            deleteFile(path);
+        }
+    }
 }

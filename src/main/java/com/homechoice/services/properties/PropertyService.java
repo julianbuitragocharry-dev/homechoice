@@ -1,16 +1,10 @@
 package com.homechoice.services.properties;
 
 import com.homechoice.aws.S3Service;
-import com.homechoice.entities.properties.Amenity;
 import com.homechoice.entities.properties.Property;
 import com.homechoice.entities.properties.PropertyImage;
-import com.homechoice.entities.properties.PropertyType;
-import com.homechoice.entities.properties.TypeConcept;
 import com.homechoice.entities.users.User;
-import com.homechoice.repositories.properties.AmenityRepository;
 import com.homechoice.repositories.properties.PropertyRepository;
-import com.homechoice.repositories.properties.PropertyTypeRepository;
-import com.homechoice.repositories.properties.TypeConceptRepository;
 import com.homechoice.repositories.users.UserRepository;
 import com.homechoice.dto.properties.PropertyDTO;
 import com.homechoice.services.users.UserService;
@@ -20,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,14 +38,8 @@ public class PropertyService {
     }
 
     public Property create(PropertyDTO propertyDTO, List<MultipartFile> images) throws IOException {
-        List<String> imagesPath = new ArrayList<>();
-
-        for (MultipartFile file : images) {
-            String imagePath = s3Service.uploadFile(file);
-            imagesPath.add(imagePath);
-        }
-
-        propertyDTO.setImages(imagesPath);
+        List<String> imagePaths = s3Service.uploadFiles(images);
+        propertyDTO.setImages(imagePaths);
 
         Property property = toEntity(propertyDTO);
         return propertyRepository.save(property);
@@ -74,14 +61,16 @@ public class PropertyService {
         return propertyRepository.save(propertyDB);
     }
 
+    // Function with bug
     public String delete(Integer id) throws IOException {
         Property property = propertyRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Property not found!"));
 
-        List<PropertyImage> propertyImages = property.getImages();
-        for (PropertyImage image : propertyImages) {
-            s3Service.deleteFile(image.getPath());
-        }
+        List<String> paths = property.getImages().stream()
+                .map(PropertyImage::getPath)
+                .collect(Collectors.toList());
+
+        s3Service.deleteFiles(paths);
 
         propertyRepository.deleteById(id);
         return "Property deleted";
