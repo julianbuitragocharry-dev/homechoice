@@ -1,5 +1,6 @@
 package com.homechoice.entities.properties;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,10 +25,8 @@ public class PropertyImage {
     @Column(name = "pri_path")
     private String path;
 
-    @Column(name = "pri_is_thumb")
-    private Boolean isThumb;
-
     @ManyToOne
     @JoinColumn(name = "pri_pro_id")
+    @JsonIgnore
     private Property property;
 }

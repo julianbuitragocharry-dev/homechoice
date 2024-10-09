@@ -1,7 +1,9 @@
 package com.homechoice.services.properties;
 
+import com.homechoice.aws.S3Service;
 import com.homechoice.entities.properties.Amenity;
 import com.homechoice.entities.properties.Property;
+import com.homechoice.entities.properties.PropertyImage;
 import com.homechoice.entities.properties.PropertyType;
 import com.homechoice.entities.properties.TypeConcept;
 import com.homechoice.entities.users.User;
@@ -11,10 +13,14 @@ import com.homechoice.repositories.properties.PropertyTypeRepository;
 import com.homechoice.repositories.properties.TypeConceptRepository;
 import com.homechoice.repositories.users.UserRepository;
 import com.homechoice.dto.properties.PropertyDTO;
+import com.homechoice.services.users.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,11 +28,13 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class PropertyService {
+    private final S3Service s3Service;
     private final PropertyRepository propertyRepository;
     private final UserRepository userRepository;
-    private final TypeConceptRepository typeConceptRepository;
-    private final PropertyTypeRepository propertyTypeRepository;
-    private final AmenityRepository amenityRepository;
+    private final TypeConceptService typeConceptService;
+    private final AmenityService amenityService;
+    private final UserService userService;
+    private final PropertyTypeService propertyTypeService;
 
     public List<Property> getAll() {
         return propertyRepository.findAll();
@@ -36,7 +44,16 @@ public class PropertyService {
         return propertyRepository.findById(id);
     }
 
-    public Property create(PropertyDTO propertyDTO) {
+    public Property create(PropertyDTO propertyDTO, List<MultipartFile> images) throws IOException {
+        List<String> imagesPath = new ArrayList<>();
+
+        for (MultipartFile file : images) {
+            String imagePath = s3Service.uploadFile(file);
+            imagesPath.add(imagePath);
+        }
+
+        propertyDTO.setImages(imagesPath);
+
         Property property = toEntity(propertyDTO);
         return propertyRepository.save(property);
     }
@@ -57,7 +74,15 @@ public class PropertyService {
         return propertyRepository.save(propertyDB);
     }
 
-    public String delete(Integer id) {
+    public String delete(Integer id) throws IOException {
+        Property property = propertyRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Property not found!"));
+
+        List<PropertyImage> propertyImages = property.getImages();
+        for (PropertyImage image : propertyImages) {
+            s3Service.deleteFile(image.getPath());
+        }
+
         propertyRepository.deleteById(id);
         return "Property deleted";
     }
@@ -73,10 +98,8 @@ public class PropertyService {
         return "A new agent will take charge of the property!";
     }
 
-    // Aux functions
-
     private Property toEntity(PropertyDTO propertyDTO) {
-        return Property.builder()
+        Property property = Property.builder()
                 .name(propertyDTO.getName())
                 .area(propertyDTO.getArea())
                 .price(propertyDTO.getPrice())
@@ -85,32 +108,24 @@ public class PropertyService {
                 .longitude(propertyDTO.getLongitude())
                 .status(propertyDTO.getStatus())
                 .description(propertyDTO.getDescription())
-                .user(getUserById(propertyDTO.getUser()))
-                .concept(getTypeConceptById(propertyDTO.getConcept()))
-                .type(getPropertyTypeById(propertyDTO.getType()))
-                .amenities(getAmenitiesByIds(propertyDTO.getAmenities()))
+                .user(userService.getUserById(propertyDTO.getUser()))
+                .concept(typeConceptService.getTypeConceptById(propertyDTO.getConcept()))
+                .type(propertyTypeService.getPropertyTypeById(propertyDTO.getType()))
+                .amenities(amenityService.getAmenitiesByIds(propertyDTO.getAmenities()))
                 .build();
+
+        property.setImages(getImagesFromPaths(property, propertyDTO.getImages()));
+        return property;
     }
 
-    private User getUserById(Integer userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
-    }
-
-    private TypeConcept getTypeConceptById(Integer conceptId) {
-        return typeConceptRepository.findById(conceptId)
-                .orElseThrow(() -> new EntityNotFoundException("Concept not found!"));
-    }
-
-    private PropertyType getPropertyTypeById(Integer typeId) {
-        return propertyTypeRepository.findById(typeId)
-                .orElseThrow(() -> new EntityNotFoundException("Type not found!"));
-    }
-
-    private List<Amenity> getAmenitiesByIds(List<Integer> amenityIds) {
-        return amenityIds.stream()
-                .map(amenityId -> amenityRepository.findById(amenityId)
-                        .orElseThrow(() -> new EntityNotFoundException("Amenity not found!")))
+    private List<PropertyImage> getImagesFromPaths(Property property, List<String> images) {
+        return images.stream()
+                .map(path -> {
+                    PropertyImage propertyImage = new PropertyImage();
+                    propertyImage.setPath(path);
+                    propertyImage.setProperty(property);
+                    return propertyImage;
+                })
                 .collect(Collectors.toList());
     }
 }
