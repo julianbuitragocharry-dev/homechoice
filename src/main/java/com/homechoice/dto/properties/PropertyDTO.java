@@ -23,4 +23,5 @@ public class PropertyDTO {
     private Integer concept;
     private Integer type;
     private List<Integer> amenities;
+    private List<String> images;
 }

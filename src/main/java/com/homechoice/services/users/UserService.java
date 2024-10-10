@@ -70,7 +70,10 @@ public class UserService {
         return "User deleted";
     }
 
-    // Aux functions
+    public User getUserById(Integer userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
+    }
 
     private User toEntity(UserDTO userDTO) {
         return User.builder()
