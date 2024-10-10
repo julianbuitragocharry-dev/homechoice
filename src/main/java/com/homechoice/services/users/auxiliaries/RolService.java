@@ -1,4 +1,4 @@
-package com.homechoice.services.users;
+package com.homechoice.services.users.auxiliaries;
 
 import com.homechoice.entities.users.Rol;
 import com.homechoice.repositories.users.RolRepository;
@@ -13,6 +13,10 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class RolService {
     private final RolRepository rolRepository;
+
+    public List<Rol> getAll() {
+        return rolRepository.findAll();
+    }
 
     public List<Rol> fetchRolesByIds(List<Integer> roleIds) {
         return roleIds.stream()

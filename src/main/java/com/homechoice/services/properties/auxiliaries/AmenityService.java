@@ -1,4 +1,4 @@
-package com.homechoice.services.properties;
+package com.homechoice.services.properties.auxiliaries;
 
 import com.homechoice.entities.properties.Amenity;
 import com.homechoice.repositories.properties.AmenityRepository;
@@ -13,6 +13,10 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class AmenityService {
     private final AmenityRepository amenityRepository;
+
+    public List<Amenity> getAll() {
+        return amenityRepository.findAll();
+    }
 
     public List<Amenity> getAmenitiesByIds(List<Integer> amenityIds) {
         return amenityIds.stream()

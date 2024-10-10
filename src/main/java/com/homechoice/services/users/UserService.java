@@ -1,14 +1,12 @@
 package com.homechoice.services.users;
 
-import com.homechoice.dto.users.AgentResponseDTO;
 import com.homechoice.entities.properties.Property;
-import com.homechoice.entities.users.Rol;
 import com.homechoice.entities.users.User;
 import com.homechoice.repositories.properties.PropertyRepository;
-import com.homechoice.repositories.users.RolRepository;
 import com.homechoice.repositories.users.UserRepository;
 import com.homechoice.dto.users.UserRequestDTO;
 import com.homechoice.dto.users.UserResponseDTO;
+import com.homechoice.services.users.auxiliaries.RolService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +19,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final RolRepository rolRepository;
     private final PropertyRepository propertyRepository;
     private final RolService rolService;
 
@@ -72,17 +69,6 @@ public class UserService {
         return "User deleted";
     }
 
-    public List<AgentResponseDTO> getAgents() {
-        return userRepository.findByRoles_Rol("AGENT").stream()
-                .map(this::toAgent)
-                .collect(Collectors.toList());
-    }
-
-    public User getUserById(Integer userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
-    }
-
     private User toEntity(UserRequestDTO userRequestDTO) {
         return User.builder()
                 .firstName(userRequestDTO.getFirstName())
@@ -107,11 +93,8 @@ public class UserService {
                 .build();
     }
 
-    private AgentResponseDTO toAgent(User user) {
-        return AgentResponseDTO.builder()
-                .id(user.getId())
-                .name(user.getFirstName() + " " + user.getLastName())
-                .build();
+    public User getUserById(Integer userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
     }
-
 }

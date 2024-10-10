@@ -1,12 +1,16 @@
 package com.homechoice.services.properties;
 
 import com.homechoice.aws.S3Service;
+import com.homechoice.dto.properties.PropertyResponseDTO;
 import com.homechoice.entities.properties.Property;
 import com.homechoice.entities.properties.PropertyImage;
 import com.homechoice.entities.users.User;
 import com.homechoice.repositories.properties.PropertyRepository;
 import com.homechoice.repositories.users.UserRepository;
-import com.homechoice.dto.properties.PropertyDTO;
+import com.homechoice.dto.properties.PropertyRequestDTO;
+import com.homechoice.services.properties.auxiliaries.AmenityService;
+import com.homechoice.services.properties.auxiliaries.PropertyTypeService;
+import com.homechoice.services.properties.auxiliaries.TypeConceptService;
 import com.homechoice.services.users.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
@@ -29,34 +33,39 @@ public class PropertyService {
     private final UserService userService;
     private final PropertyTypeService propertyTypeService;
 
-    public List<Property> getAll() {
-        return propertyRepository.findAll();
+    public List<PropertyResponseDTO> getAll() {
+        return propertyRepository.findAll().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     public Optional<Property> getById(Integer id) {
         return propertyRepository.findById(id);
     }
 
-    public Property create(PropertyDTO propertyDTO, List<MultipartFile> images) throws IOException {
+    public Property create(PropertyRequestDTO propertyRequestDTO, List<MultipartFile> images) throws IOException {
         List<String> imagePaths = s3Service.uploadFiles(images);
-        propertyDTO.setImages(imagePaths);
+        propertyRequestDTO.setImages(imagePaths);
 
-        Property property = toEntity(propertyDTO);
+        Property property = toEntity(propertyRequestDTO);
         return propertyRepository.save(property);
     }
 
-    public Property update(Integer id, Property property) {
+    public Property update(Integer id, PropertyRequestDTO propertyRequestDTO) {
         Property propertyDB = propertyRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("¡Property not found!"));
 
-        propertyDB.setName(property.getName());
-        propertyDB.setArea(property.getArea());
-        propertyDB.setAddress(property.getAddress());
-        propertyDB.setLatitude(property.getLatitude());
-        propertyDB.setLongitude(property.getLongitude());
-        propertyDB.setStatus(property.getStatus());
-        propertyDB.setDescription(property.getDescription());
-        propertyDB.setImages(property.getImages());
+        propertyDB.setName(propertyRequestDTO.getName());
+        propertyDB.setArea(propertyRequestDTO.getArea());
+        propertyDB.setPrice(propertyRequestDTO.getPrice());
+        propertyDB.setAddress(propertyRequestDTO.getAddress());
+        propertyDB.setLatitude(propertyRequestDTO.getLatitude());
+        propertyDB.setLongitude(propertyRequestDTO.getLongitude());
+        propertyDB.setStatus(propertyRequestDTO.getStatus());
+        propertyDB.setDescription(propertyRequestDTO.getDescription());
+        propertyDB.setConcept(typeConceptService.getTypeConceptById(propertyRequestDTO.getConcept()));
+        propertyDB.setType(propertyTypeService.getPropertyTypeById(propertyRequestDTO.getType()));
+        propertyDB.setAmenities(amenityService.getAmenitiesByIds(propertyRequestDTO.getAmenities()));
 
         return propertyRepository.save(propertyDB);
     }
@@ -86,24 +95,37 @@ public class PropertyService {
         return "A new agent will take charge of the property!";
     }
 
-    private Property toEntity(PropertyDTO propertyDTO) {
+    private Property toEntity(PropertyRequestDTO propertyRequestDTO) {
         Property property = Property.builder()
-                .name(propertyDTO.getName())
-                .area(propertyDTO.getArea())
-                .price(propertyDTO.getPrice())
-                .address(propertyDTO.getAddress())
-                .latitude(propertyDTO.getLatitude())
-                .longitude(propertyDTO.getLongitude())
-                .status(propertyDTO.getStatus())
-                .description(propertyDTO.getDescription())
-                .user(userService.getUserById(propertyDTO.getUser()))
-                .concept(typeConceptService.getTypeConceptById(propertyDTO.getConcept()))
-                .type(propertyTypeService.getPropertyTypeById(propertyDTO.getType()))
-                .amenities(amenityService.getAmenitiesByIds(propertyDTO.getAmenities()))
+                .name(propertyRequestDTO.getName())
+                .area(propertyRequestDTO.getArea())
+                .price(propertyRequestDTO.getPrice())
+                .address(propertyRequestDTO.getAddress())
+                .latitude(propertyRequestDTO.getLatitude())
+                .longitude(propertyRequestDTO.getLongitude())
+                .status(propertyRequestDTO.getStatus())
+                .description(propertyRequestDTO.getDescription())
+                .user(userService.getUserById(propertyRequestDTO.getUser()))
+                .concept(typeConceptService.getTypeConceptById(propertyRequestDTO.getConcept()))
+                .type(propertyTypeService.getPropertyTypeById(propertyRequestDTO.getType()))
+                .amenities(amenityService.getAmenitiesByIds(propertyRequestDTO.getAmenities()))
                 .build();
 
-        property.setImages(getImagesFromPaths(property, propertyDTO.getImages()));
+        property.setImages(getImagesFromPaths(property, propertyRequestDTO.getImages()));
         return property;
+    }
+
+    private PropertyResponseDTO toDTO(Property property) {
+        return PropertyResponseDTO.builder()
+                .id(property.getId())
+                .name(property.getName())
+                .area(property.getArea())
+                .price(property.getPrice())
+                .status(property.getStatus())
+                .concept(property.getConcept().getConcept())
+                .type(property.getType().getType())
+                .images(property.getImages().stream().map(PropertyImage::getPath).collect(Collectors.toList()))
+                .build();
     }
 
     private List<PropertyImage> getImagesFromPaths(Property property, List<String> images) {

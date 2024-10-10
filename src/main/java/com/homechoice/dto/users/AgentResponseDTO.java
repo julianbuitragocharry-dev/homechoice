@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class AgentResponseDTO {
-    private Integer id;
     private String name;
+    private String phone;
+    private String email;
 }

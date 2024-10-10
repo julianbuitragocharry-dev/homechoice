@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class PropertyDTO {
+public class PropertyRequestDTO {
     private String name;
     private Long area;
     private BigDecimal price;

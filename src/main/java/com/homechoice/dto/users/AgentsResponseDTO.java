@@ -7,8 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class AgentDTO {
+public class AgentsResponseDTO {
+    private Integer id;
     private String name;
-    private String phone;
-    private String email;
 }
