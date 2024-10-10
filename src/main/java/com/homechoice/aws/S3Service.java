@@ -37,9 +37,11 @@ public class S3Service {
     public void deleteFile(String path) throws IOException {
         try {
             String fileName = path.replace("https://homechoicebucket.s3.us-east-2.amazonaws.com/", "");
+            String key = fileName.replace("%20", " ");
+
             DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
                     .bucket("homechoicebucket")
-                    .key(fileName)
+                    .key(key)
                     .build();
 
             s3Client.deleteObject(deleteObjectRequest);
@@ -57,7 +59,6 @@ public class S3Service {
         return uploadPaths;
     }
 
-    // Function with bug
     public void deleteFiles(List<String> paths) throws IOException {
         for (String path : paths) {
             deleteFile(path);

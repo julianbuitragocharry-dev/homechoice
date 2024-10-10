@@ -61,7 +61,6 @@ public class PropertyService {
         return propertyRepository.save(propertyDB);
     }
 
-    // Function with bug
     public String delete(Integer id) throws IOException {
         Property property = propertyRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Property not found!"));
