@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class UserDTO {
+public class UserRequestDTO {
     private String firstName;
     private String lastName;
     private String phone;
@@ -17,5 +17,5 @@ public class UserDTO {
     private String nit;
     private String email;
     private String password;
-    private List<Integer> roles;
+    private List<Integer> rolesId;
 }

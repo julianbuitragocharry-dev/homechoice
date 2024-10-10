@@ -1,12 +1,13 @@
 package com.homechoice.services.users;
 
+import com.homechoice.dto.users.AgentResponseDTO;
 import com.homechoice.entities.properties.Property;
 import com.homechoice.entities.users.Rol;
 import com.homechoice.entities.users.User;
 import com.homechoice.repositories.properties.PropertyRepository;
 import com.homechoice.repositories.users.RolRepository;
 import com.homechoice.repositories.users.UserRepository;
-import com.homechoice.dto.users.UserDTO;
+import com.homechoice.dto.users.UserRequestDTO;
 import com.homechoice.dto.users.UserResponseDTO;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RolRepository rolRepository;
     private final PropertyRepository propertyRepository;
+    private final RolService rolService;
 
     public List<UserResponseDTO> getAll() {
         return userRepository.findAll().stream()
@@ -33,16 +35,16 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public User createUser(UserDTO userDTO) {
-        User user = toEntity(userDTO);
+    public User createUser(UserRequestDTO userRequestDTO) {
+        User user = toEntity(userRequestDTO);
         return userRepository.save(user);
     }
 
-    public User update(Integer id, UserDTO userDTO) {
+    public User update(Integer id, UserRequestDTO userRequestDTO) {
         User userDB = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("¡User not found!"));
 
-        User updatedUser = toEntity(userDTO);
+        User updatedUser = toEntity(userRequestDTO);
 
         userDB.setFirstName(updatedUser.getFirstName());
         userDB.setLastName(updatedUser.getLastName());
@@ -70,21 +72,27 @@ public class UserService {
         return "User deleted";
     }
 
+    public List<AgentResponseDTO> getAgents() {
+        return userRepository.findByRoles_Rol("AGENT").stream()
+                .map(this::toAgent)
+                .collect(Collectors.toList());
+    }
+
     public User getUserById(Integer userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found!"));
     }
 
-    private User toEntity(UserDTO userDTO) {
+    private User toEntity(UserRequestDTO userRequestDTO) {
         return User.builder()
-                .firstName(userDTO.getFirstName())
-                .lastName(userDTO.getLastName())
-                .phone(userDTO.getPhone())
-                .address(userDTO.getAddress())
-                .nit(userDTO.getNit())
-                .email(userDTO.getEmail())
-                .password(userDTO.getPassword())
-                .roles(getRolesByIds(userDTO.getRoles()))
+                .firstName(userRequestDTO.getFirstName())
+                .lastName(userRequestDTO.getLastName())
+                .phone(userRequestDTO.getPhone())
+                .address(userRequestDTO.getAddress())
+                .nit(userRequestDTO.getNit())
+                .email(userRequestDTO.getEmail())
+                .password(userRequestDTO.getPassword())
+                .roles(rolService.fetchRolesByIds(userRequestDTO.getRolesId()))
                 .build();
     }
 
@@ -99,10 +107,11 @@ public class UserService {
                 .build();
     }
 
-    private List<Rol> getRolesByIds(List<Integer> roleIds) {
-        return roleIds.stream()
-                .map(roleId -> rolRepository.findById(roleId)
-                        .orElseThrow(() -> new EntityNotFoundException("¡Rol not found!")))
-                .collect(Collectors.toList());
+    private AgentResponseDTO toAgent(User user) {
+        return AgentResponseDTO.builder()
+                .id(user.getId())
+                .name(user.getFirstName() + " " + user.getLastName())
+                .build();
     }
+
 }

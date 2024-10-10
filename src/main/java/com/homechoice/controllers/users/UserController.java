@@ -1,7 +1,7 @@
 package com.homechoice.controllers.users;
 
 import com.homechoice.entities.users.User;
-import com.homechoice.dto.users.UserDTO;
+import com.homechoice.dto.users.UserRequestDTO;
 import com.homechoice.dto.users.UserResponseDTO;
 import com.homechoice.services.users.UserService;
 import lombok.AllArgsConstructor;
@@ -37,13 +37,13 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@RequestBody UserDTO userDTO) {
-        return userService.createUser(userDTO);
+    public User createUser(@RequestBody UserRequestDTO userRequestDTO) {
+        return userService.createUser(userRequestDTO);
     }
 
     @PutMapping("{id}")
-    public User updateUser(@PathVariable Integer id, @RequestBody UserDTO userDTO) {
-        return userService.update(id, userDTO);
+    public User updateUser(@PathVariable Integer id, @RequestBody UserRequestDTO userRequestDTO) {
+        return userService.update(id, userRequestDTO);
     }
 
     @DeleteMapping("{id}")
