@@ -37,21 +37,11 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User update(Integer id, UserRequestDTO userRequestDTO) {
+    public User updateUser(Integer id, UserRequestDTO userRequestDTO) {
         User userDB = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("¡User not found!"));
 
-        User updatedUser = toEntity(userRequestDTO);
-
-        userDB.setFirstName(updatedUser.getFirstName());
-        userDB.setLastName(updatedUser.getLastName());
-        userDB.setPhone(updatedUser.getPhone());
-        userDB.setAddress(updatedUser.getAddress());
-        userDB.setEmail(updatedUser.getEmail());
-        userDB.setPassword(updatedUser.getPassword());
-        userDB.setRoles(updatedUser.getRoles());
-
-        return userRepository.save(userDB);
+        return getUser(userRequestDTO, userDB);
     }
 
     public String delete(Integer id) {
@@ -69,7 +59,7 @@ public class UserService {
         return "User deleted";
     }
 
-    private User toEntity(UserRequestDTO userRequestDTO) {
+    public User toEntity(UserRequestDTO userRequestDTO) {
         return User.builder()
                 .firstName(userRequestDTO.getFirstName())
                 .lastName(userRequestDTO.getLastName())
@@ -96,5 +86,19 @@ public class UserService {
     public User getUserById(Integer userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found!"));
+    }
+
+    public User getUser(UserRequestDTO userRequestDTO, User userDB) {
+        User updatedUser = toEntity(userRequestDTO);
+
+        userDB.setFirstName(updatedUser.getFirstName());
+        userDB.setLastName(updatedUser.getLastName());
+        userDB.setPhone(updatedUser.getPhone());
+        userDB.setAddress(updatedUser.getAddress());
+        userDB.setEmail(updatedUser.getEmail());
+        userDB.setPassword(updatedUser.getPassword());
+        userDB.setRoles(updatedUser.getRoles());
+
+        return userRepository.save(userDB);
     }
 }
