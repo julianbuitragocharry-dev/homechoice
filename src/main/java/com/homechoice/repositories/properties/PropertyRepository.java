@@ -9,5 +9,11 @@ import java.util.List;
 
 @Repository
 public interface PropertyRepository extends JpaRepository<Property, Integer> {
-    List<Property> findByUser(User user);
+    List<Property> findByAgentIsNotNull();
+
+    List<Property> findByAgentIsNull();
+
+    List<Property> findByAgentId(Integer id);
+
+    List<Property> findByAgent(User user);
 }

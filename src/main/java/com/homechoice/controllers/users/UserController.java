@@ -1,53 +1,49 @@
 package com.homechoice.controllers.users;
 
-import com.homechoice.entities.users.User;
-import com.homechoice.dto.users.UserRequestDTO;
+import com.homechoice.dto.users.AgentResponseDTO;
+import com.homechoice.dto.users.UserDTO;
 import com.homechoice.dto.users.UserResponseDTO;
+import com.homechoice.entities.users.User;
 import com.homechoice.services.users.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("users")
 @AllArgsConstructor
 public class UserController {
     private final UserService userService;
 
+    @GetMapping("agents/{id}")
+    public AgentResponseDTO getAgentById(@PathVariable Integer id) {
+        return userService.getAgentById(id);
+    }
+
     @GetMapping
-    public List<UserResponseDTO> getUsers() {
-        return userService.getAll();
+    public List<UserResponseDTO> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("agents")
+    public List<UserResponseDTO> getAllAgents() {
+        return userService.getAllAgents();
     }
 
     @GetMapping("{id}")
-    public Optional<User> getUserById(@PathVariable Integer id) {
-        return userService.getById(id);
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@RequestBody UserRequestDTO userRequestDTO) {
-        return userService.createUser(userRequestDTO);
-    }
-
-    @PutMapping("{id}")
-    public User updateUser(@PathVariable Integer id, @RequestBody UserRequestDTO userRequestDTO) {
-        return userService.updateUser(id, userRequestDTO);
+    public UserDTO getUserById(@PathVariable Integer id) {
+        return userService.getUserById(id);
     }
 
     @DeleteMapping("{id}")
-    public String deleteUser(@PathVariable Integer id) {
-        return userService.delete(id);
+    public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok("User deleted");
     }
 }

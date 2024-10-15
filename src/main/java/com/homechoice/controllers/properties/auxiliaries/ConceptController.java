@@ -1,7 +1,7 @@
 package com.homechoice.controllers.properties.auxiliaries;
 
-import com.homechoice.entities.properties.PropertyType;
-import com.homechoice.services.properties.auxiliaries.PropertyTypeService;
+import com.homechoice.entities.properties.Concept;
+import com.homechoice.services.properties.auxiliaries.ConceptService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("property/types")
+@RequestMapping("property/concepts")
 @AllArgsConstructor
-public class PropertyTypeController {
-    private PropertyTypeService propertyTypeService;
+public class ConceptController {
+    private ConceptService conceptService;
 
     @GetMapping
-    public List<PropertyType> getTypes() {
-        return propertyTypeService.getAll();
+    public List<Concept> getConcepts() {
+        return conceptService.getAll();
     }
 }

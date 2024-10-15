@@ -16,7 +16,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "property_image")
-public class PropertyImage {
+public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pri_id")

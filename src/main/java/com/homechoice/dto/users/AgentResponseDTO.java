@@ -9,6 +9,6 @@ import lombok.Setter;
 @Builder
 public class AgentResponseDTO {
     private String name;
-    private String phone;
     private String email;
+    private String phone;
 }

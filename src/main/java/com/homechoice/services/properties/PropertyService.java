@@ -1,16 +1,15 @@
 package com.homechoice.services.properties;
 
 import com.homechoice.aws.S3Service;
-import com.homechoice.dto.properties.PropertyResponseDTO;
+import com.homechoice.dto.properties.PropertyDTO;
+import com.homechoice.entities.properties.Amenity;
 import com.homechoice.entities.properties.Property;
-import com.homechoice.entities.properties.PropertyImage;
+import com.homechoice.entities.properties.Image;
 import com.homechoice.entities.users.User;
 import com.homechoice.repositories.properties.PropertyRepository;
-import com.homechoice.repositories.users.UserRepository;
-import com.homechoice.dto.properties.PropertyRequestDTO;
 import com.homechoice.services.properties.auxiliaries.AmenityService;
-import com.homechoice.services.properties.auxiliaries.PropertyTypeService;
-import com.homechoice.services.properties.auxiliaries.TypeConceptService;
+import com.homechoice.services.properties.auxiliaries.TypeService;
+import com.homechoice.services.properties.auxiliaries.ConceptService;
 import com.homechoice.services.users.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
@@ -19,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,115 +25,131 @@ import java.util.stream.Collectors;
 public class PropertyService {
     private final S3Service s3Service;
     private final PropertyRepository propertyRepository;
-    private final UserRepository userRepository;
-    private final TypeConceptService typeConceptService;
+    private final ConceptService conceptService;
+    private final TypeService typeService;
     private final AmenityService amenityService;
     private final UserService userService;
-    private final PropertyTypeService propertyTypeService;
 
-    public List<PropertyResponseDTO> getAll() {
-        return propertyRepository.findAll().stream()
+    public List<PropertyDTO> getAll() {
+        return propertyRepository.findByAgentIsNotNull().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
-
-    public Optional<Property> getById(Integer id) {
-        return propertyRepository.findById(id);
+    
+    public List<PropertyDTO> getAllByAgentId(Integer id) {
+        return propertyRepository.findByAgentId(id).stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+    
+    public List<PropertyDTO> getAllByAgentIsNull() {
+        return propertyRepository.findByAgentIsNull().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+    
+    public PropertyDTO getById(Integer id) {
+        return toDTO(findById(id));
     }
 
-    public Property create(PropertyRequestDTO propertyRequestDTO, List<MultipartFile> images) throws IOException {
+    public PropertyDTO create(PropertyDTO dto, List<MultipartFile> images) throws IOException {
         List<String> imagePaths = s3Service.uploadFiles(images);
-        propertyRequestDTO.setImages(imagePaths);
+        dto.setImages(imagePaths);
 
-        Property property = toEntity(propertyRequestDTO);
-        return propertyRepository.save(property);
+        Property property = toEntity(dto);
+        propertyRepository.save(property);
+        return toDTO(property);
     }
 
-    public Property update(Integer id, PropertyRequestDTO propertyRequestDTO) {
-        Property propertyDB = propertyRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("¡Property not found!"));
+    public void update(PropertyDTO dto, Integer id) {
+        Property property = findById(id);
 
-        propertyDB.setName(propertyRequestDTO.getName());
-        propertyDB.setArea(propertyRequestDTO.getArea());
-        propertyDB.setPrice(propertyRequestDTO.getPrice());
-        propertyDB.setAddress(propertyRequestDTO.getAddress());
-        propertyDB.setLatitude(propertyRequestDTO.getLatitude());
-        propertyDB.setLongitude(propertyRequestDTO.getLongitude());
-        propertyDB.setStatus(propertyRequestDTO.getStatus());
-        propertyDB.setDescription(propertyRequestDTO.getDescription());
-        propertyDB.setConcept(typeConceptService.getTypeConceptById(propertyRequestDTO.getConcept()));
-        propertyDB.setType(propertyTypeService.getPropertyTypeById(propertyRequestDTO.getType()));
-        propertyDB.setAmenities(amenityService.getAmenitiesByIds(propertyRequestDTO.getAmenities()));
+        property.setName(dto.getName());
+        property.setArea(dto.getArea());
+        property.setAddress(dto.getAddress());
+        property.setLatitude(dto.getLatitude());
+        property.setLongitude(dto.getLongitude());
+        property.setStatus(dto.getStatus());
+        property.setDescription(dto.getDescription());
+        property.setConcept(conceptService.getByConcept(dto.getConcept()));
+        property.setType(typeService.getByType(dto.getType()));
+        property.setAmenities(amenityService.getByAmenityNames(dto.getAmenities()));
 
-        return propertyRepository.save(propertyDB);
+        property.setDescription(dto.getDescription());
+
+        propertyRepository.save(property);
     }
 
-    public String delete(Integer id) throws IOException {
-        Property property = propertyRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Property not found!"));
+    public void delete(Integer id) throws IOException {
+        Property property = findById(id);
 
         List<String> paths = property.getImages().stream()
-                .map(PropertyImage::getPath)
-                .collect(Collectors.toList());
+                        .map(Image::getPath)
+                        .collect(Collectors.toList());
 
         s3Service.deleteFiles(paths);
 
         propertyRepository.deleteById(id);
-        return "Property deleted";
     }
 
-    public String setUserIdForProperty(Integer propertyId, Integer userId) {
-        Property property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new EntityNotFoundException("Property not found!"));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
-        property.setUser(user);
-
+    public void setAgent(Integer id, Integer agentId) {
+        Property property = findById(id);
+        User agent = userService.findById(agentId);
+        property.setAgent(agent);
         propertyRepository.save(property);
-        return "A new agent will take charge of the property!";
     }
 
-    private Property toEntity(PropertyRequestDTO propertyRequestDTO) {
+    private Property findById(Integer id) {
+        return propertyRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Property not found"));
+    }
+
+    private List<Image> getImages(Property property, List<String> paths) {
+        return paths.stream().map(path -> {
+                    Image image = new Image();
+                    image.setPath(path);
+                    image.setProperty(property);
+                    return image;
+                }).collect(Collectors.toList());
+    }
+
+    private Property toEntity(PropertyDTO dto) {
         Property property = Property.builder()
-                .name(propertyRequestDTO.getName())
-                .area(propertyRequestDTO.getArea())
-                .price(propertyRequestDTO.getPrice())
-                .address(propertyRequestDTO.getAddress())
-                .latitude(propertyRequestDTO.getLatitude())
-                .longitude(propertyRequestDTO.getLongitude())
-                .status(propertyRequestDTO.getStatus())
-                .description(propertyRequestDTO.getDescription())
-                .user(userService.getUserById(propertyRequestDTO.getUser()))
-                .concept(typeConceptService.getTypeConceptById(propertyRequestDTO.getConcept()))
-                .type(propertyTypeService.getPropertyTypeById(propertyRequestDTO.getType()))
-                .amenities(amenityService.getAmenitiesByIds(propertyRequestDTO.getAmenities()))
+                .name(dto.getName())
+                .area(dto.getArea())
+                .price(dto.getPrice())
+                .address(dto.getAddress())
+                .latitude(dto.getLatitude())
+                .longitude(dto.getLongitude())
+                .status(dto.getStatus())
+                .description(dto.getDescription())
+                .agent(userService.findById(dto.getAgent()))
+                .concept(conceptService.getByConcept(dto.getConcept()))
+                .type(typeService.getByType(dto.getType()))
+                .amenities(amenityService.getByAmenityNames(dto.getAmenities()))
                 .build();
 
-        property.setImages(getImagesFromPaths(property, propertyRequestDTO.getImages()));
+        property.setImages(getImages(property, dto.getImages()));
+
         return property;
     }
 
-    private PropertyResponseDTO toDTO(Property property) {
-        return PropertyResponseDTO.builder()
+    private PropertyDTO toDTO(Property property) {
+        return PropertyDTO.builder()
                 .id(property.getId())
                 .name(property.getName())
                 .area(property.getArea())
                 .price(property.getPrice())
+                .address(property.getAddress())
+                .latitude(property.getLatitude())
+                .longitude(property.getLongitude())
                 .status(property.getStatus())
+                .description(property.getDescription())
+                .agent(property.getAgent() != null ? property.getAgent().getId() : null)
                 .concept(property.getConcept().getConcept())
                 .type(property.getType().getType())
-                .images(property.getImages().stream().map(PropertyImage::getPath).collect(Collectors.toList()))
+                .images(property.getImages().stream().map(Image::getPath).collect(Collectors.toList()))
+                .amenities(property.getAmenities().stream().map(Amenity::getAmenity).collect(Collectors.toList()))
                 .build();
-    }
-
-    private List<PropertyImage> getImagesFromPaths(Property property, List<String> images) {
-        return images.stream()
-                .map(path -> {
-                    PropertyImage propertyImage = new PropertyImage();
-                    propertyImage.setPath(path);
-                    propertyImage.setProperty(property);
-                    return propertyImage;
-                })
-                .collect(Collectors.toList());
     }
 }

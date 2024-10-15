@@ -1,7 +1,7 @@
 package com.homechoice.controllers.properties.auxiliaries;
 
-import com.homechoice.entities.properties.TypeConcept;
-import com.homechoice.services.properties.auxiliaries.TypeConceptService;
+import com.homechoice.entities.properties.Type;
+import com.homechoice.services.properties.auxiliaries.TypeService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("property/concepts")
+@RequestMapping("property/types")
 @AllArgsConstructor
-public class TypeConceptController {
-    private TypeConceptService typeConceptService;
+public class TypeController {
+    private TypeService typeService;
 
     @GetMapping
-    public List<TypeConcept> getConcepts() {
-        return typeConceptService.getAll();
+    public List<Type> getTypes() {
+        return typeService.getAll();
     }
 }

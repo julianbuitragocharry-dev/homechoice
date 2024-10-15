@@ -1,18 +1,19 @@
 package com.homechoice.services.users;
 
+import com.homechoice.dto.users.AgentResponseDTO;
+import com.homechoice.dto.users.UserDTO;
+import com.homechoice.dto.users.UserResponseDTO;
 import com.homechoice.entities.properties.Property;
+import com.homechoice.entities.users.Rol;
 import com.homechoice.entities.users.User;
 import com.homechoice.repositories.properties.PropertyRepository;
+import com.homechoice.repositories.users.RolRepository;
 import com.homechoice.repositories.users.UserRepository;
-import com.homechoice.dto.users.UserRequestDTO;
-import com.homechoice.dto.users.UserResponseDTO;
-import com.homechoice.services.users.auxiliaries.RolService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,85 +21,84 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
     private final PropertyRepository propertyRepository;
-    private final RolService rolService;
 
-    public List<UserResponseDTO> getAll() {
+    // PUBLIC
+    public AgentResponseDTO getAgentById(Integer id) {
+        return toAgentDTO(findById(id));
+    }
+
+    // SUPER_ADMIN
+    // TODO: Filter out autheticated user to prevent self-modification
+    public List<UserResponseDTO> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(this::toDTO)
+                .map(this::toResponseDTO)
                 .collect(Collectors.toList());
     }
 
-    public Optional<User> getById(Integer id) {
-        return userRepository.findById(id);
+    // ADMIN
+    // TODO: Filter out autheticated user to prevent self-modification
+    public List<UserResponseDTO> getAllAgents() {
+        return userRepository.findByRoles_Rol("AGENT").stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
-    public User createUser(UserRequestDTO userRequestDTO) {
-        User user = toEntity(userRequestDTO);
-        return userRepository.save(user);
+    // TODO: Create and update methods. Delete for admin
+
+    // ADMIN AND SUPER_ADMIN
+    public UserDTO getUserById(Integer id) {
+        User user = findById(id);
+        return toDTO(user);
     }
 
-    public User updateUser(Integer id, UserRequestDTO userRequestDTO) {
-        User userDB = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("¡User not found!"));
-
-        return getUser(userRequestDTO, userDB);
-    }
-
-    public String delete(Integer id) {
-        User userToDelete = userRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException("User not found!"));
-
-        List<Property> properties = propertyRepository.findByUser(userToDelete);
+    // SUPER_ADMIN
+    public void deleteUser(Integer id) {
+        User user = findById(id);
+        List<Property> properties = propertyRepository.findByAgent(user);
 
         for (Property property : properties) {
-            property.setUser(null);
+            property.setAgent(null);
             propertyRepository.save(property);
         }
 
         userRepository.deleteById(id);
-        return "User deleted";
     }
 
-    public User toEntity(UserRequestDTO userRequestDTO) {
-        return User.builder()
-                .firstName(userRequestDTO.getFirstName())
-                .lastName(userRequestDTO.getLastName())
-                .phone(userRequestDTO.getPhone())
-                .address(userRequestDTO.getAddress())
-                .nit(userRequestDTO.getNit())
-                .email(userRequestDTO.getEmail())
-                .password(userRequestDTO.getPassword())
-                .roles(rolService.fetchRolesByIds(userRequestDTO.getRolesId()))
-                .build();
+    public User findById(Integer id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 
-    private UserResponseDTO toDTO(User user) {
+    private UserResponseDTO toResponseDTO(User user) {
         return UserResponseDTO.builder()
                 .id(user.getId())
-                .name(user.getFirstName() + " " + user.getLastName())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
                 .phone(user.getPhone())
                 .address(user.getAddress())
                 .nit(user.getNit())
-                .email(user.getEmail())
                 .build();
     }
 
-    public User getUserById(Integer userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
+    private UserDTO toDTO(User user) {
+        return UserDTO.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .address(user.getAddress())
+                .nit(user.getNit())
+                .roles(user.getRoles().stream().map(Rol::getRol).collect(Collectors.toList()))
+                .build();
     }
 
-    public User getUser(UserRequestDTO userRequestDTO, User userDB) {
-        User updatedUser = toEntity(userRequestDTO);
-
-        userDB.setFirstName(updatedUser.getFirstName());
-        userDB.setLastName(updatedUser.getLastName());
-        userDB.setPhone(updatedUser.getPhone());
-        userDB.setAddress(updatedUser.getAddress());
-        userDB.setEmail(updatedUser.getEmail());
-        userDB.setPassword(updatedUser.getPassword());
-        userDB.setRoles(updatedUser.getRoles());
-
-        return userRepository.save(userDB);
+    private AgentResponseDTO toAgentDTO(User user) {
+        return AgentResponseDTO.builder()
+                .name(user.getFirstName() + " " + user.getLastName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .build();
     }
 }

@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "property_type")
-public class PropertyType {
+public class Type {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "prt_id")
