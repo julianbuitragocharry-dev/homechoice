@@ -92,6 +92,7 @@ public class PropertyService {
         propertyRepository.deleteById(id);
     }
 
+    // Bug admin set properties
     public void setAgent(Integer id, Integer agentId) {
         Property property = findById(id);
         User agent = userService.findById(agentId);

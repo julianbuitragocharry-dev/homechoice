@@ -1,6 +1,7 @@
 package com.homechoice.controllers.properties;
 
 import com.homechoice.dto.properties.PropertyDTO;
+import com.homechoice.responses.ApiResponse;
 import com.homechoice.services.properties.PropertyService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -50,25 +51,25 @@ public class PropertyController {
     public ResponseEntity<PropertyDTO> saveProperty(
             @RequestParam("images") List<MultipartFile> images,
             @RequestPart("data") PropertyDTO request) throws IOException {
-        PropertyDTO dto = propertyService.create(request, images);
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+        PropertyDTO response = propertyService.create(request, images);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<String> updateProperty(@PathVariable Integer id, @RequestBody PropertyDTO request) {
+    public ResponseEntity<ApiResponse> updateProperty(@PathVariable Integer id, @RequestBody PropertyDTO request) {
         propertyService.update(request, id);
-        return ResponseEntity.ok("Property updated");
+        return ResponseEntity.ok(new ApiResponse("Property updated"));
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteProperty(@PathVariable Integer id) throws IOException {
+    public ResponseEntity<ApiResponse> deleteProperty(@PathVariable Integer id) throws IOException {
         propertyService.delete(id);
-        return ResponseEntity.ok("Property deleted");
+        return ResponseEntity.ok(new ApiResponse("Property deleted"));
     }
 
     @PutMapping("{id}/user/{agentId}")
-    public ResponseEntity<String> updateUserProperty(@PathVariable Integer id, @PathVariable Integer agentId) {
+    public ResponseEntity<ApiResponse> updateUserProperty(@PathVariable Integer id, @PathVariable Integer agentId) {
         propertyService.setAgent(id, agentId);
-        return ResponseEntity.ok("Agent " + agentId + " has been assigned to this property");
+        return ResponseEntity.ok(new ApiResponse("Agent " + agentId + " has been assigned to this property"));
     }
 }

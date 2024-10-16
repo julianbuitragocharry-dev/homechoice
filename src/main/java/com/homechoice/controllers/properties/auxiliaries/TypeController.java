@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("property/types")
 @AllArgsConstructor
 public class TypeController {
-    private TypeService typeService;
+    private final TypeService typeService;
 
     @GetMapping
     public List<Type> getTypes() {

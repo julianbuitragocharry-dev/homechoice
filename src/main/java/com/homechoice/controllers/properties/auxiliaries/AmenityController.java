@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("property/amenities")
 @AllArgsConstructor
 public class AmenityController {
-    private AmenityService amenityService;
+    private final AmenityService amenityService;
 
     @GetMapping
     public List<Amenity> getAmenities() {

@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("property/concepts")
 @AllArgsConstructor
 public class ConceptController {
-    private ConceptService conceptService;
+    private final ConceptService conceptService;
 
     @GetMapping
     public List<Concept> getConcepts() {
