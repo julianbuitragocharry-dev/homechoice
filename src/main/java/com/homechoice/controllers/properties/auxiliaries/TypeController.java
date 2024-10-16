@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("property/types")
+@RequestMapping("api/property/types")
 @AllArgsConstructor
 public class TypeController {
     private final TypeService typeService;
