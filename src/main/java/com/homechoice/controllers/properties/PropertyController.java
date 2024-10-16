@@ -22,12 +22,12 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/properties")
+@RequestMapping("api/properties")
 @AllArgsConstructor
 public class PropertyController {
     private final PropertyService propertyService;
 
-    @GetMapping
+    @GetMapping("/public")
     public List<PropertyDTO> getProperties() {
         return propertyService.getAll();
     }

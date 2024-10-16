@@ -21,12 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("users")
+@RequestMapping("api/users")
 @AllArgsConstructor
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("agents/{id}")
+    @GetMapping("public/agents/{id}")
     public AgentResponseDTO getAgentById(@PathVariable Integer id) {
         return userService.getAgentById(id);
     }
