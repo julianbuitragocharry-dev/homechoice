@@ -60,18 +60,18 @@ public class Property {
 
     @ManyToOne
     @JoinColumn(name = "pro_use_id")
-    private User user;
+    private User agent;
 
     @ManyToOne
     @JoinColumn(name = "pro_tyc_id")
-    private TypeConcept concept;
+    private Concept concept;
 
     @ManyToOne
     @JoinColumn(name = "pro_prt_id")
-    private PropertyType type;
+    private Type type;
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL)
-    private List<PropertyImage> images;
+    private List<Image> images;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

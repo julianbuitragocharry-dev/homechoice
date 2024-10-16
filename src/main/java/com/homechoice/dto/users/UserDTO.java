@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 @Builder
 public class UserDTO {
+    private Integer id;
     private String firstName;
     private String lastName;
     private String phone;
@@ -17,5 +18,5 @@ public class UserDTO {
     private String nit;
     private String email;
     private String password;
-    private List<Integer> roles;
+    private List<String> roles;
 }

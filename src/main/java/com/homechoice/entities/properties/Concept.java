@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "type_concept")
-public class TypeConcept {
+public class Concept {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tyc_id")

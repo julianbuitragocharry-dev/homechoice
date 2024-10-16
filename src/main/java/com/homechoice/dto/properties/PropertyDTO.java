@@ -11,6 +11,7 @@ import java.util.List;
 @Setter
 @Builder
 public class PropertyDTO {
+    private Integer id;
     private String name;
     private Long area;
     private BigDecimal price;
@@ -19,9 +20,9 @@ public class PropertyDTO {
     private BigDecimal longitude;
     private Boolean status;
     private String description;
-    private Integer user;
-    private Integer concept;
-    private Integer type;
-    private List<Integer> amenities;
+    private Integer agent;
+    private String concept;
+    private String type;
     private List<String> images;
+    private List<String> amenities;
 }

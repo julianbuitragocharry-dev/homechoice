@@ -8,7 +8,12 @@ import lombok.Setter;
 @Setter
 @Builder
 public class AgentDTO {
-    private String name;
+    private Integer id;
+    private String firstName;
+    private String lastName;
     private String phone;
+    private String address;
+    private String nit;
     private String email;
+    private String password;
 }

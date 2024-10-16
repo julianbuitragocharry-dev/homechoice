@@ -1,11 +1,11 @@
 package com.homechoice.controllers.properties;
 
-import com.homechoice.aws.S3Service;
-import com.homechoice.entities.properties.Property;
 import com.homechoice.dto.properties.PropertyDTO;
+import com.homechoice.responses.ApiResponse;
 import com.homechoice.services.properties.PropertyService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,52 +15,61 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/properties")
+@RequestMapping("api/properties")
 @AllArgsConstructor
 public class PropertyController {
     private final PropertyService propertyService;
-    private final S3Service s3Service;
 
-    @GetMapping
-    public List<Property> getAll() {
+    @GetMapping("/public")
+    public List<PropertyDTO> getProperties() {
         return propertyService.getAll();
     }
 
+    @GetMapping("agent/{id}")
+    public List<PropertyDTO> getPropertiesByAgentId(@PathVariable Integer id) {
+        return propertyService.getAllByAgentId(id);
+    }
+
+    @GetMapping("null")
+    public List<PropertyDTO> getPropertiesAgentIsNull() {
+        return propertyService.getAllByAgentIsNull();
+    }
+
     @GetMapping("{id}")
-    public Optional<Property> getById(@PathVariable Integer id) {
+    public PropertyDTO getPropertyById(@PathVariable Integer id) {
         return propertyService.getById(id);
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Property save(
+    public ResponseEntity<PropertyDTO> saveProperty(
             @RequestParam("images") List<MultipartFile> images,
-            @RequestPart("data") PropertyDTO propertyDTO) throws IOException {
-        return propertyService.create(propertyDTO, images);
+            @RequestPart("data") PropertyDTO request) throws IOException {
+        PropertyDTO response = propertyService.create(request, images);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("{id}")
-    public Property update(@PathVariable Integer id, @RequestBody Property property) {
-        return propertyService.update(id, property);
+    public ResponseEntity<ApiResponse> updateProperty(@PathVariable Integer id, @RequestBody PropertyDTO request) {
+        propertyService.update(request, id);
+        return ResponseEntity.ok(new ApiResponse("Property updated"));
     }
 
     @DeleteMapping("{id}")
-    public String delete(@PathVariable Integer id) throws IOException {
-        return propertyService.delete(id);
+    public ResponseEntity<ApiResponse> deleteProperty(@PathVariable Integer id) throws IOException {
+        propertyService.delete(id);
+        return ResponseEntity.ok(new ApiResponse("Property deleted"));
     }
 
-    @PutMapping("{propertyId}/user/{userId}")
-    public String updateUser(@PathVariable Integer propertyId, @PathVariable Integer userId) {
-        return propertyService.setUserIdForProperty(propertyId, userId);
+    @PutMapping("{id}/user/{agentId}")
+    public ResponseEntity<ApiResponse> updateUserProperty(@PathVariable Integer id, @PathVariable Integer agentId) {
+        propertyService.setAgent(id, agentId);
+        return ResponseEntity.ok(new ApiResponse("Agent " + agentId + " has been assigned to this property"));
     }
 }

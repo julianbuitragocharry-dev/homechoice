@@ -1,4 +1,4 @@
-package com.homechoice.config;
+package com.homechoice.aws.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
