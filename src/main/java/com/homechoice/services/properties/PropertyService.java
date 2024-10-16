@@ -92,10 +92,17 @@ public class PropertyService {
         propertyRepository.deleteById(id);
     }
 
-    // Bug admin set properties
     public void setAgent(Integer id, Integer agentId) {
         Property property = findById(id);
         User agent = userService.findById(agentId);
+
+        boolean isAgent = agent.getRoles().stream()
+                .anyMatch(rol -> rol.getRol().equals("AGENT"));
+
+        if (!isAgent) {
+            throw new IllegalArgumentException("User is not an agent");
+        }
+
         property.setAgent(agent);
         propertyRepository.save(property);
     }
