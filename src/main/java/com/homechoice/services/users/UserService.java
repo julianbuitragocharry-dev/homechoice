@@ -12,6 +12,7 @@ import com.homechoice.repositories.users.UserRepository;
 import com.homechoice.services.users.auxiliaries.RolService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -24,6 +25,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PropertyRepository propertyRepository;
     private final RolService rolService;
+    private final PasswordEncoder passwordEncoder;
 
     // PUBLIC
     public AgentResponseDTO getAgentById(Integer id) {
@@ -63,6 +65,7 @@ public class UserService {
     // SUPER_ADMIN
     public UserResponseDTO createUser(UserDTO dto) {
         User user = toEntity(dto);
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         userRepository.save(user);
         return toResponseDTO(user);
@@ -73,6 +76,7 @@ public class UserService {
         User user = toEntity(dto);
         List<String> roles = Collections.singletonList("AGENT");
         user.setRoles(rolService.getByRolesNames(roles));
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         userRepository.save(user);
         return toResponseDTO(user);
@@ -96,7 +100,7 @@ public class UserService {
         user.setRoles(rolService.getByRolesNames(newRoles));
 
         if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
-            user.setPassword(dto.getPassword());
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
 
         if (oldRoles.contains("AGENT") && !newRoles.contains("AGENT")) {
@@ -124,7 +128,7 @@ public class UserService {
         user.setEmail(dto.getEmail());
 
         if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
-            user.setPassword(dto.getPassword());
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
 
         userRepository.save(user);
