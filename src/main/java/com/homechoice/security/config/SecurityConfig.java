@@ -36,9 +36,9 @@ public class SecurityConfig {
                 }))
                 .authorizeRequests(authRequests ->
                     authRequests
-                        //.requestMatchers("auth/**").permitAll()
-                        //.requestMatchers("/api/*/public/**").permitAll()
-                        .anyRequest().permitAll()
+                        .requestMatchers("auth/**").permitAll()
+                        .requestMatchers("/api/*/public/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager ->
                         sessionManager

@@ -6,6 +6,7 @@ import com.homechoice.services.properties.PropertyService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,11 +33,13 @@ public class PropertyController {
         return propertyService.getAll();
     }
 
+    @PreAuthorize("hasAuthority('AGENT')")
     @GetMapping("agent/{id}")
     public List<PropertyDTO> getPropertiesByAgentId(@PathVariable Integer id) {
         return propertyService.getAllByAgentId(id);
     }
 
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     @GetMapping("null")
     public List<PropertyDTO> getPropertiesAgentIsNull() {
         return propertyService.getAllByAgentIsNull();
@@ -47,6 +50,7 @@ public class PropertyController {
         return propertyService.getById(id);
     }
 
+    @PreAuthorize("hasAuthority('AGENT')")
     @PostMapping
     public ResponseEntity<PropertyDTO> saveProperty(
             @RequestParam("images") List<MultipartFile> images,
@@ -67,6 +71,7 @@ public class PropertyController {
         return ResponseEntity.ok(new ApiResponse("Property deleted"));
     }
 
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     @PutMapping("{id}/user/{agentId}")
     public ResponseEntity<ApiResponse> updateUserProperty(@PathVariable Integer id, @PathVariable Integer agentId) {
         propertyService.setAgent(id, agentId);
