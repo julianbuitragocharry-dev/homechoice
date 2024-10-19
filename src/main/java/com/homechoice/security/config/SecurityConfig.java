@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(request -> {
                     var corsConfiguration = new CorsConfiguration();
-                    corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200"));
+                    corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200", "https://homechoice-angular.vercel.app/home"));
                     corsConfiguration.setAllowedHeaders(List.of("GET", "POST", "PUT", "DELETE"));
                     corsConfiguration.addAllowedHeader("*");
                     return corsConfiguration;
