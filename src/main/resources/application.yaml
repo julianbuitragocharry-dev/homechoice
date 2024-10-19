@@ -4,9 +4,9 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/home_choice
     username: postgres
-    password: 
+    password: postgres
   jpa:
-    database-platform: org.postgresql.Driver
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -16,4 +16,4 @@ spring:
         secret-key:
         access-key:
       region:
-        static:
+        static: us-east-2
