@@ -40,7 +40,7 @@ public class PropertyController {
     }
 
     @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
-    @GetMapping("null")
+    @GetMapping("nulls")
     public List<PropertyDTO> getPropertiesAgentIsNull() {
         return propertyService.getAllByAgentIsNull();
     }

@@ -2,11 +2,11 @@ spring:
   application:
     name: home_choice
   datasource:
-    url: jdbc:mysql://localhost:3306/home_choice
-    username: root
-    password:
+    url: jdbc:postgresql://localhost:5432/home_choice
+    username: postgres
+    password: postgres
   jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -16,4 +16,4 @@ spring:
         secret-key:
         access-key:
       region:
-        static:
+        static: us-east-2
