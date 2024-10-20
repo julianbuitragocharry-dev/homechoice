@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/property/amenities")
+@RequestMapping("api/properties/amenities")
 @AllArgsConstructor
 public class AmenityController {
     private final AmenityService amenityService;

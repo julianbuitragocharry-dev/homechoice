@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -29,8 +30,17 @@ public class PropertyController {
     private final PropertyService propertyService;
 
     @GetMapping("/public")
-    public List<PropertyDTO> getProperties() {
-        return propertyService.getAll();
+    public List<PropertyDTO> getProperties(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Boolean status,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal minArea,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String concept
+            ) {
+        return propertyService.getAll(
+                name, status, minPrice, minArea, type, concept
+        );
     }
 
     @PreAuthorize("hasAuthority('AGENT')")

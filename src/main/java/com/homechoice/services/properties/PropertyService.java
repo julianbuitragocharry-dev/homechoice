@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,8 +31,17 @@ public class PropertyService {
     private final AmenityService amenityService;
     private final UserService userService;
 
-    public List<PropertyDTO> getAll() {
-        return propertyRepository.findByAgentIsNotNull().stream()
+    public List<PropertyDTO> getAll(
+        String name,
+        Boolean status,
+        BigDecimal minPrice,
+        BigDecimal minArea,
+        String type,
+        String concept
+    ) {
+        return propertyRepository.findAll(
+                name, status, minPrice, minArea, type, concept
+                ).stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
