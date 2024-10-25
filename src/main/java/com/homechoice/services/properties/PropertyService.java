@@ -39,9 +39,12 @@ public class PropertyService {
         String type,
         String concept
     ) {
+        if (name != null) {
+            name = "%" + name.toLowerCase() + "%";
+        }
+
         return propertyRepository.findAll(
-                name, status, minPrice, minArea, type, concept
-                ).stream()
+                name, status, minPrice, minArea, type, concept).stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }

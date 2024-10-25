@@ -38,9 +38,7 @@ public class PropertyController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String concept
             ) {
-        return propertyService.getAll(
-                name, status, minPrice, minArea, type, concept
-        );
+        return propertyService.getAll(name, status, minPrice, minArea, type, concept);
     }
 
     @PreAuthorize("hasAuthority('AGENT')")
@@ -55,7 +53,7 @@ public class PropertyController {
         return propertyService.getAllByAgentIsNull();
     }
 
-    @GetMapping("{id}")
+    @GetMapping("public/{id}")
     public PropertyDTO getPropertyById(@PathVariable Integer id) {
         return propertyService.getById(id);
     }

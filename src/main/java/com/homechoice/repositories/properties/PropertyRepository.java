@@ -12,12 +12,15 @@ import java.util.List;
 
 @Repository
 public interface PropertyRepository extends JpaRepository<Property, Integer> {
-    @Query("SELECT p FROM Property p WHERE (:name IS NULL or LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')))" +
+    @Query("SELECT p FROM Property p " +
+            "JOIN p.type t " +
+            "JOIN p.concept c " +
+            "WHERE (:name IS NULL OR p.name ILIKE :name)" +
             "AND (:status IS NULL OR p.status = :status)" +
             "AND (:minPrice IS NULL OR p.price >= :minPrice)" +
             "AND (:minArea IS NULL OR p.area >= :minArea)" +
-            "AND (:type IS NULL OR p.type.type = :type)" +
-            "AND (:concept IS NULL OR p.concept.concept = :concept)" +
+            "AND (:type IS NULL OR t.type = :type)" +
+            "AND (:concept IS NULL OR c.concept = :concept)" +
             "AND (p.agent IS NOT NULL)")
     List<Property> findAll(
             @Param("name") String name,
