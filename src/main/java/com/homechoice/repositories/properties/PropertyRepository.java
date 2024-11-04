@@ -19,8 +19,8 @@ public interface PropertyRepository extends JpaRepository<Property, Integer> {
             "AND (:status IS NULL OR p.status = :status)" +
             "AND (:minPrice IS NULL OR p.price >= :minPrice)" +
             "AND (:minArea IS NULL OR p.area >= :minArea)" +
-            "AND (:type IS NULL OR t.type = :type)" +
-            "AND (:concept IS NULL OR c.concept = :concept)" +
+            "AND (:type IS NULL OR t.type ILIKE :type)" +
+            "AND (:concept IS NULL OR c.concept ILIKE :concept)" +
             "AND (p.agent IS NOT NULL)")
     List<Property> findAll(
             @Param("name") String name,

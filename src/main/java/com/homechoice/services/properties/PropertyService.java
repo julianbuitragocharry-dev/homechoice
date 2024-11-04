@@ -43,6 +43,14 @@ public class PropertyService {
             name = "%" + name.toLowerCase() + "%";
         }
 
+        if(type != null) {
+            type = "%" + type + "%";
+        }
+
+        if (concept != null) {
+            concept = "%" + concept + "%";
+        }
+
         return propertyRepository.findAll(
                 name, status, minPrice, minArea, type, concept).stream()
                 .map(this::toDTO)
