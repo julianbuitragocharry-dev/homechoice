@@ -2,6 +2,8 @@ package com.homechoice.repositories.properties;
 
 import com.homechoice.entities.properties.Property;
 import com.homechoice.entities.users.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,13 +24,14 @@ public interface PropertyRepository extends JpaRepository<Property, Integer> {
             "AND (:type IS NULL OR t.type ILIKE :type)" +
             "AND (:concept IS NULL OR c.concept ILIKE :concept)" +
             "AND (p.agent IS NOT NULL)")
-    List<Property> findAll(
+    Page<Property> findAll(
             @Param("name") String name,
             @Param("status") Boolean status,
             @Param("minPrice") BigDecimal minPrice,
             @Param("minArea") BigDecimal minArea,
             @Param("type") String type,
-            @Param("concept") String concept);
+            @Param("concept") String concept,
+            Pageable pageable);
 
     List<Property> findByAgentIsNull();
 

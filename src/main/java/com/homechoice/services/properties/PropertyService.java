@@ -13,6 +13,8 @@ import com.homechoice.services.properties.auxiliaries.ConceptService;
 import com.homechoice.services.users.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,13 +33,14 @@ public class PropertyService {
     private final AmenityService amenityService;
     private final UserService userService;
 
-    public List<PropertyDTO> getAll(
+    public Page<PropertyDTO> getAll(
         String name,
         Boolean status,
         BigDecimal minPrice,
         BigDecimal minArea,
         String type,
-        String concept
+        String concept,
+        Pageable pageable
     ) {
         if (name != null) {
             name = "%" + name.toLowerCase() + "%";
@@ -52,9 +55,8 @@ public class PropertyService {
         }
 
         return propertyRepository.findAll(
-                name, status, minPrice, minArea, type, concept).stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+                name, status, minPrice, minArea, type, concept, pageable)
+                .map(this::toDTO);
     }
     
     public List<PropertyDTO> getAllByAgentId(Integer id) {

@@ -4,6 +4,9 @@ import com.homechoice.dto.properties.PropertyDTO;
 import com.homechoice.responses.ApiResponse;
 import com.homechoice.services.properties.PropertyService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,15 +33,18 @@ public class PropertyController {
     private final PropertyService propertyService;
 
     @GetMapping("/public")
-    public List<PropertyDTO> getProperties(
+    public Page<PropertyDTO> getProperties(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Boolean status,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal minArea,
             @RequestParam(required = false) String type,
-            @RequestParam(required = false) String concept
+            @RequestParam(required = false) String concept,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "6") Integer size
             ) {
-        return propertyService.getAll(name, status, minPrice, minArea, type, concept);
+        Pageable pageable = PageRequest.of(page, size);
+        return propertyService.getAll(name, status, minPrice, minArea, type, concept, pageable);
     }
 
     @PreAuthorize("hasAuthority('AGENT')")
