@@ -42,33 +42,50 @@ public class PropertyService {
         String concept,
         Pageable pageable
     ) {
-        if (name != null) {
-            name = "%" + name.toLowerCase() + "%";
-        }
-
-        if(type != null) {
-            type = "%" + type + "%";
-        }
-
-        if (concept != null) {
-            concept = "%" + concept + "%";
-        }
+        if (name != null) { name = "%" + name + "%"; }
+        if(type != null) { type = "%" + type + "%"; }
+        if (concept != null) { concept = "%" + concept + "%"; }
 
         return propertyRepository.findAll(
                 name, status, minPrice, minArea, type, concept, pageable)
                 .map(this::toDTO);
     }
     
-    public List<PropertyDTO> getAllByAgentId(Integer id) {
-        return propertyRepository.findByAgentId(id).stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+    public Page<PropertyDTO> getAllByAgentId(
+            Integer id,
+            String name,
+            Boolean status,
+            BigDecimal minPrice,
+            BigDecimal minArea,
+            String type,
+            String concept,
+            Pageable pageable
+    ) {
+        if (name != null) { name = "%" + name + "%"; }
+        if (type != null) { type = "%" + type + "%"; }
+        if (concept != null) { concept = "%" + concept + "%"; }
+
+        return propertyRepository.findByAgentId(
+                name, status, minPrice, minArea, type, concept, id, pageable)
+                .map(this::toDTO);
     }
     
-    public List<PropertyDTO> getAllByAgentIsNull() {
-        return propertyRepository.findByAgentIsNull().stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+    public Page<PropertyDTO> getAllByAgentIsNull(
+            String name,
+            Boolean status,
+            BigDecimal minPrice,
+            BigDecimal minArea,
+            String type,
+            String concept,
+            Pageable pageable
+    ) {
+        if (name != null) { name = "%" + name + "%"; }
+        if (type != null) { type = "%" + type + "%"; }
+        if (concept != null) { concept = "%" + concept + "%"; }
+
+        return propertyRepository.findByAgentIsNull(
+                name, status, minPrice, minArea, type, concept, pageable)
+                .map(this::toDTO);
     }
     
     public PropertyDTO getById(Integer id) {

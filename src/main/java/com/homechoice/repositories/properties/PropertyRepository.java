@@ -33,9 +33,45 @@ public interface PropertyRepository extends JpaRepository<Property, Integer> {
             @Param("concept") String concept,
             Pageable pageable);
 
-    List<Property> findByAgentIsNull();
+    @Query("SELECT p FROM Property p " +
+            "JOIN p.type t " +
+            "JOIN p.concept c " +
+            "WHERE (:name IS NULL OR p.name ILIKE :name) " +
+            "AND (:status IS NULL OR p.status = :status) " +
+            "AND (:minPrice IS NULL OR p.price >= :minPrice) " +
+            "AND (:minArea IS NULL OR p.area >= :minArea) " +
+            "AND (:type IS NULL OR t.type ILIKE :type) " +
+            "AND (:concept IS NULL OR c.concept ILIKE :concept) " +
+            "AND p.agent IS NULL")
+    Page<Property> findByAgentIsNull(
+            @Param("name") String name,
+            @Param("status") Boolean status,
+            @Param("minPrice") BigDecimal minPrice,
+            @Param("minArea") BigDecimal minArea,
+            @Param("type") String type,
+            @Param("concept") String concept,
+            Pageable pageable);
 
-    List<Property> findByAgentId(Integer id);
+    @Query("SELECT p FROM Property p " +
+            "JOIN p.type t " +
+            "JOIN p.concept c " +
+            "WHERE (:name IS NULL OR p.name ILIKE :name) " +
+            "AND (:status IS NULL OR p.status = :status) " +
+            "AND (:minPrice IS NULL OR p.price >= :minPrice) " +
+            "AND (:minArea IS NULL OR p.area >= :minArea) " +
+            "AND (:type IS NULL OR t.type ILIKE :type) " +
+            "AND (:concept IS NULL OR c.concept ILIKE :concept) " +
+            "AND p.agent.id = :agentId")
+    Page<Property> findByAgentId(
+            @Param("name") String name,
+            @Param("status") Boolean status,
+            @Param("minPrice") BigDecimal minPrice,
+            @Param("minArea") BigDecimal minArea,
+            @Param("type") String type,
+            @Param("concept") String concept,
+            @Param("agentId") Integer agentId,
+            Pageable pageable
+    );
 
     List<Property> findByAgent(User user);
 }

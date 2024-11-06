@@ -49,14 +49,34 @@ public class PropertyController {
 
     @PreAuthorize("hasAuthority('AGENT')")
     @GetMapping("agent/{id}")
-    public List<PropertyDTO> getPropertiesByAgentId(@PathVariable Integer id) {
-        return propertyService.getAllByAgentId(id);
+    public Page<PropertyDTO> getPropertiesByAgentId(
+            @PathVariable Integer id,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Boolean status,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal minArea,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String concept,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "6") Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return propertyService.getAllByAgentId(id, name, status, minPrice, minArea, type, concept, pageable);
     }
 
     @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     @GetMapping("nulls")
-    public List<PropertyDTO> getPropertiesAgentIsNull() {
-        return propertyService.getAllByAgentIsNull();
+    public Page<PropertyDTO> getPropertiesAgentIsNull(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Boolean status,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal minArea,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String concept,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "6") Integer size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return propertyService.getAllByAgentIsNull(name, status, minPrice, minArea, type, concept, pageable);
     }
 
     @GetMapping("public/{id}")
