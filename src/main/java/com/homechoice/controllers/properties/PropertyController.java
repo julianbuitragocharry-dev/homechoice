@@ -48,9 +48,8 @@ public class PropertyController {
     }
 
     @PreAuthorize("hasAuthority('AGENT')")
-    @GetMapping("agent/{id}")
+    @GetMapping("agent")
     public Page<PropertyDTO> getPropertiesByAgentId(
-            @PathVariable Integer id,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Boolean status,
             @RequestParam(required = false) BigDecimal minPrice,
@@ -60,7 +59,7 @@ public class PropertyController {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "6") Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        return propertyService.getAllByAgentId(id, name, status, minPrice, minArea, type, concept, pageable);
+        return propertyService.getAllByAgentId(name, status, minPrice, minArea, type, concept, pageable);
     }
 
     @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")

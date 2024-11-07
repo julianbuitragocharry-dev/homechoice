@@ -7,6 +7,7 @@ import com.homechoice.entities.properties.Property;
 import com.homechoice.entities.properties.Image;
 import com.homechoice.entities.users.User;
 import com.homechoice.repositories.properties.PropertyRepository;
+import com.homechoice.security.auth.AuthService;
 import com.homechoice.services.properties.auxiliaries.AmenityService;
 import com.homechoice.services.properties.auxiliaries.TypeService;
 import com.homechoice.services.properties.auxiliaries.ConceptService;
@@ -32,6 +33,7 @@ public class PropertyService {
     private final TypeService typeService;
     private final AmenityService amenityService;
     private final UserService userService;
+    private final AuthService authService;
 
     public Page<PropertyDTO> getAll(
         String name,
@@ -52,7 +54,6 @@ public class PropertyService {
     }
     
     public Page<PropertyDTO> getAllByAgentId(
-            Integer id,
             String name,
             Boolean status,
             BigDecimal minPrice,
@@ -64,6 +65,8 @@ public class PropertyService {
         if (name != null) { name = "%" + name + "%"; }
         if (type != null) { type = "%" + type + "%"; }
         if (concept != null) { concept = "%" + concept + "%"; }
+        Integer id = authService.getAuthenticatedUserId();
+
 
         return propertyRepository.findByAgentId(
                 name, status, minPrice, minArea, type, concept, id, pageable)
