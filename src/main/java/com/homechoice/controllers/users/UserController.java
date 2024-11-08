@@ -38,7 +38,7 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     @GetMapping("agents")
     public List<UserResponseDTO> getAllAgents() {
         return userService.getAllAgents();
