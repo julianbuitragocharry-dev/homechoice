@@ -29,14 +29,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(request -> {
                     var corsConfiguration = new CorsConfiguration();
-                    corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200", "https://homechoice-angular.vercel.app/home"));
-                    corsConfiguration.setAllowedHeaders(List.of("GET", "POST", "PUT", "DELETE"));
-                    corsConfiguration.addAllowedHeader("*");
+                    corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200", "https://homechoice.vercel.app"));
+                    corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+                    corsConfiguration.setAllowedHeaders(List.of("*"));
+                    corsConfiguration.setAllowCredentials(true);
                     return corsConfiguration;
                 }))
                 .authorizeRequests(authRequests ->
                     authRequests
-                        .requestMatchers("auth/**").permitAll()
+                        .requestMatchers("api/auth/**").permitAll()
                         .requestMatchers("/api/*/public/**").permitAll()
                         .anyRequest().authenticated()
                 )

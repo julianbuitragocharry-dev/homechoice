@@ -9,9 +9,13 @@ import com.homechoice.entities.users.Rol;
 import com.homechoice.entities.users.User;
 import com.homechoice.repositories.properties.PropertyRepository;
 import com.homechoice.repositories.users.UserRepository;
+import com.homechoice.security.auth.AuthService;
 import com.homechoice.services.users.auxiliaries.RolService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +30,7 @@ public class UserService {
     private final PropertyRepository propertyRepository;
     private final RolService rolService;
     private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
     // PUBLIC
     public AgentResponseDTO getAgentById(Integer id) {
@@ -42,18 +47,37 @@ public class UserService {
     }
 
     // SUPER_ADMIN
-    public List<UserResponseDTO> getAllUsers() {
-        return userRepository.findAll().stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
+    public Page<UserResponseDTO> getAllUsers(String nit, Pageable pageable) {
+        Integer authenticatedId = authService.getAuthenticatedUserId();
+        Page<User> page = userRepository.findAll(nit, pageable);
+
+        if (nit != null) { nit = "%" + nit + "%"; }
+
+        return new PageImpl<>(
+                page.getContent().stream()
+                        .filter(user -> !user.getId().equals(authenticatedId))
+                        .map(this::toResponseDTO)
+                        .collect(Collectors.toList()),
+                pageable,
+                page.getTotalElements()
+        );
     }
 
     // ADMIN
-    // TODO: Filter out autheticated user to prevent self-modification
-    public List<UserResponseDTO> getAllAgents() {
-        return userRepository.findByRoles_Rol("AGENT").stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
+    public Page<UserResponseDTO> getAllAgents(String nit, Pageable pageable) {
+        Integer authenticatedId = authService.getAuthenticatedUserId();
+        Page<User> page = userRepository.findByRolesRol("AGENT", nit, pageable);
+
+        if (nit != null) { nit = "%" + nit + "%"; }
+
+        return new PageImpl<>(
+                page.getContent().stream()
+                        .filter(user -> !user.getId().equals(authenticatedId))
+                        .map(this::toResponseDTO)
+                        .collect(Collectors.toList()),
+                pageable,
+                page.getTotalElements()
+        );
     }
 
     // ADMIN AND SUPER_ADMIN

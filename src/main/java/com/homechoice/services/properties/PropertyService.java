@@ -7,16 +7,20 @@ import com.homechoice.entities.properties.Property;
 import com.homechoice.entities.properties.Image;
 import com.homechoice.entities.users.User;
 import com.homechoice.repositories.properties.PropertyRepository;
+import com.homechoice.security.auth.AuthService;
 import com.homechoice.services.properties.auxiliaries.AmenityService;
 import com.homechoice.services.properties.auxiliaries.TypeService;
 import com.homechoice.services.properties.auxiliaries.ConceptService;
 import com.homechoice.services.users.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,23 +33,62 @@ public class PropertyService {
     private final TypeService typeService;
     private final AmenityService amenityService;
     private final UserService userService;
+    private final AuthService authService;
 
-    public List<PropertyDTO> getAll() {
-        return propertyRepository.findByAgentIsNotNull().stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+    public Page<PropertyDTO> getAll(
+        String name,
+        Boolean status,
+        BigDecimal minPrice,
+        BigDecimal minArea,
+        String type,
+        String concept,
+        Pageable pageable
+    ) {
+        if (name != null) { name = "%" + name + "%"; }
+        if(type != null) { type = "%" + type + "%"; }
+        if (concept != null) { concept = "%" + concept + "%"; }
+
+        return propertyRepository.findAll(
+                name, status, minPrice, minArea, type, concept, pageable)
+                .map(this::toDTO);
     }
     
-    public List<PropertyDTO> getAllByAgentId(Integer id) {
-        return propertyRepository.findByAgentId(id).stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+    public Page<PropertyDTO> getAllByAgentId(
+            String name,
+            Boolean status,
+            BigDecimal minPrice,
+            BigDecimal minArea,
+            String type,
+            String concept,
+            Pageable pageable
+    ) {
+        if (name != null) { name = "%" + name + "%"; }
+        if (type != null) { type = "%" + type + "%"; }
+        if (concept != null) { concept = "%" + concept + "%"; }
+        Integer id = authService.getAuthenticatedUserId();
+
+
+        return propertyRepository.findByAgentId(
+                name, status, minPrice, minArea, type, concept, id, pageable)
+                .map(this::toDTO);
     }
     
-    public List<PropertyDTO> getAllByAgentIsNull() {
-        return propertyRepository.findByAgentIsNull().stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+    public Page<PropertyDTO> getAllByAgentIsNull(
+            String name,
+            Boolean status,
+            BigDecimal minPrice,
+            BigDecimal minArea,
+            String type,
+            String concept,
+            Pageable pageable
+    ) {
+        if (name != null) { name = "%" + name + "%"; }
+        if (type != null) { type = "%" + type + "%"; }
+        if (concept != null) { concept = "%" + concept + "%"; }
+
+        return propertyRepository.findByAgentIsNull(
+                name, status, minPrice, minArea, type, concept, pageable)
+                .map(this::toDTO);
     }
     
     public PropertyDTO getById(Integer id) {

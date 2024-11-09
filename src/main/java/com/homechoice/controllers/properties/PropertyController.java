@@ -4,6 +4,9 @@ import com.homechoice.dto.properties.PropertyDTO;
 import com.homechoice.responses.ApiResponse;
 import com.homechoice.services.properties.PropertyService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -29,23 +33,52 @@ public class PropertyController {
     private final PropertyService propertyService;
 
     @GetMapping("/public")
-    public List<PropertyDTO> getProperties() {
-        return propertyService.getAll();
+    public Page<PropertyDTO> getProperties(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Boolean status,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal minArea,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String concept,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "6") Integer size
+            ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return propertyService.getAll(name, status, minPrice, minArea, type, concept, pageable);
     }
 
     @PreAuthorize("hasAuthority('AGENT')")
-    @GetMapping("agent/{id}")
-    public List<PropertyDTO> getPropertiesByAgentId(@PathVariable Integer id) {
-        return propertyService.getAllByAgentId(id);
+    @GetMapping("agent")
+    public Page<PropertyDTO> getPropertiesByAgentId(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Boolean status,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal minArea,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String concept,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "6") Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return propertyService.getAllByAgentId(name, status, minPrice, minArea, type, concept, pageable);
     }
 
     @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     @GetMapping("nulls")
-    public List<PropertyDTO> getPropertiesAgentIsNull() {
-        return propertyService.getAllByAgentIsNull();
+    public Page<PropertyDTO> getPropertiesAgentIsNull(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Boolean status,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal minArea,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String concept,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "6") Integer size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return propertyService.getAllByAgentIsNull(name, status, minPrice, minArea, type, concept, pageable);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("public/{id}")
     public PropertyDTO getPropertyById(@PathVariable Integer id) {
         return propertyService.getById(id);
     }

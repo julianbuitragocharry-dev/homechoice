@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/property/concepts")
+@RequestMapping("api/properties/public/concepts")
 @AllArgsConstructor
 public class ConceptController {
     private final ConceptService conceptService;
