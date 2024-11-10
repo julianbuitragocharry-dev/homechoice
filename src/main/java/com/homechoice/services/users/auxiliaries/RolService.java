@@ -13,7 +13,7 @@ public class RolService {
     private final RolRepository rolRepository;
 
     public List<Rol> getAll() {
-        return rolRepository.findAll();
+        return rolRepository.findAllRoles();
     }
 
     public List<Rol> getByRolesNames(List<String> roles) {

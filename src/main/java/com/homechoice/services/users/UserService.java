@@ -14,7 +14,6 @@ import com.homechoice.services.users.auxiliaries.RolService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -49,35 +48,17 @@ public class UserService {
     // SUPER_ADMIN
     public Page<UserResponseDTO> getAllUsers(String nit, Pageable pageable) {
         Integer authenticatedId = authService.getAuthenticatedUserId();
-        Page<User> page = userRepository.findAll(nit, pageable);
-
         if (nit != null) { nit = "%" + nit + "%"; }
-
-        return new PageImpl<>(
-                page.getContent().stream()
-                        .filter(user -> !user.getId().equals(authenticatedId))
-                        .map(this::toResponseDTO)
-                        .collect(Collectors.toList()),
-                pageable,
-                page.getTotalElements()
-        );
+        return userRepository.findAll(nit, authenticatedId, pageable)
+                .map(this::toResponseDTO);
     }
 
     // ADMIN
     public Page<UserResponseDTO> getAllAgents(String nit, Pageable pageable) {
         Integer authenticatedId = authService.getAuthenticatedUserId();
-        Page<User> page = userRepository.findByRolesRol("AGENT", nit, pageable);
-
         if (nit != null) { nit = "%" + nit + "%"; }
-
-        return new PageImpl<>(
-                page.getContent().stream()
-                        .filter(user -> !user.getId().equals(authenticatedId))
-                        .map(this::toResponseDTO)
-                        .collect(Collectors.toList()),
-                pageable,
-                page.getTotalElements()
-        );
+        return userRepository.findByRolesRol("AGENT", nit, authenticatedId, pageable)
+                .map(this::toResponseDTO);
     }
 
     // ADMIN AND SUPER_ADMIN
