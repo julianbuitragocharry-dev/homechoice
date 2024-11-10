@@ -1,7 +1,7 @@
 package com.homechoice.security.auth;
 
-import com.homechoice.entities.users.User;
-import com.homechoice.repositories.users.UserRepository;
+import com.homechoice.model.user.User;
+import com.homechoice.repository.user.UserRepository;
 import com.homechoice.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

@@ -1,6 +1,6 @@
 package com.homechoice.security.config;
 
-import com.homechoice.repositories.users.UserRepository;
+import com.homechoice.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

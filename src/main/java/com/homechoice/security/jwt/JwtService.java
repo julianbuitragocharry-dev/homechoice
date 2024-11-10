@@ -1,6 +1,6 @@
 package com.homechoice.security.jwt;
 
-import com.homechoice.entities.users.User;
+import com.homechoice.model.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
