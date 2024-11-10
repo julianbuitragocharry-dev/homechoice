@@ -1,4 +1,4 @@
-package com.homechoice.controller.properties.auxiliary;
+package com.homechoice.controller.property.auxiliary;
 
 import com.homechoice.model.property.Concept;
 import com.homechoice.service.property.auxiliary.ConceptService;

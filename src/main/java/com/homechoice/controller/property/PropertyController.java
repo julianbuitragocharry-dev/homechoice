@@ -1,4 +1,4 @@
-package com.homechoice.controller.properties;
+package com.homechoice.controller.property;
 
 import com.homechoice.dto.property.PropertyDTO;
 import com.homechoice.response.ApiResponse;

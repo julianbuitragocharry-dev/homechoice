@@ -1,4 +1,4 @@
-package com.homechoice.controller.users.auxiliary;
+package com.homechoice.controller.user.auxiliary;
 
 import com.homechoice.model.user.Rol;
 import com.homechoice.service.user.auxiliary.RolService;

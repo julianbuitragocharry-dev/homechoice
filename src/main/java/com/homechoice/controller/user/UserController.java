@@ -1,4 +1,4 @@
-package com.homechoice.controller.users;
+package com.homechoice.controller.user;
 
 import com.homechoice.dto.user.AgentDTO;
 import com.homechoice.dto.user.AgentResponseDTO;
