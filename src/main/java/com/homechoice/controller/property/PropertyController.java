@@ -33,7 +33,7 @@ public class PropertyController {
     private final PropertyService propertyService;
 
     @GetMapping("/public")
-    public Page<PropertyDTO> getProperties(
+    public Page<?> getProperties(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Boolean status,
             @RequestParam(required = false) BigDecimal minPrice,
@@ -49,7 +49,7 @@ public class PropertyController {
 
     @PreAuthorize("hasAuthority('AGENT')")
     @GetMapping("agent")
-    public Page<PropertyDTO> getPropertiesByAgentId(
+    public Page<?> getPropertiesByAgentId(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Boolean status,
             @RequestParam(required = false) BigDecimal minPrice,
@@ -64,7 +64,7 @@ public class PropertyController {
 
     @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     @GetMapping("nulls")
-    public Page<PropertyDTO> getPropertiesAgentIsNull(
+    public Page<?> getPropertiesAgentIsNull(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Boolean status,
             @RequestParam(required = false) BigDecimal minPrice,

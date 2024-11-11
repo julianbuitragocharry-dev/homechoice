@@ -36,7 +36,7 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     @GetMapping
-    public Page<UserResponseDTO> getAllUsers(
+    public Page<?> getAllUsers(
         @RequestParam(required = false) String nit,
         @RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "6") Integer size
@@ -47,7 +47,7 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     @GetMapping("agents")
-    public Page<UserResponseDTO> getAllAgents(
+    public Page<?> getAllAgents(
             @RequestParam(required = false) String nit,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "6") Integer size
