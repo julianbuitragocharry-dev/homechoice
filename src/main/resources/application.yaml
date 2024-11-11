@@ -10,10 +10,10 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-  cloud:
-    aws:
-      credentials:
-        secret-key:
-        access-key:
-      region:
-        static: us-east-2
+
+cloud-storage:
+  s3:
+    bucket-name:
+    access-key:
+    secret-key:
+    region:
