@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class HelloWorldController {
 
-    @GetMapping("hello")
+    @GetMapping
     public MessageResponse hello() {
         return new MessageResponse(
                 HttpStatus.OK.value(),
