@@ -14,22 +14,23 @@ import software.amazon.awssdk.services.s3.S3Client;
  */
 @Configuration
 public class S3Config {
+
     /**
      * AWS Access Key for authentication.
      */
-    @Value("${cloud-storage.s3.access-key}")
+    @Value("${spring.cloud.aws.credentials.access-key}")
     private String accessKey;
 
     /**
      * AWS Access Key for authentication.
      */
-    @Value("${cloud-storage.s3.secret-key}")
+    @Value("${spring.cloud.aws.credentials.secret-key}")
     private String secretKey;
 
     /**
      * AWS region for the S3 client.
      */
-    @Value("${cloud-storage.s3.region}")
+    @Value("${spring.cloud.aws.region.static}")
     private String region;
 
     /**

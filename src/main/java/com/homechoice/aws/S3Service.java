@@ -25,7 +25,7 @@ public class S3Service {
     /**
      * AWS S3 Bucket name configured in application properties.
      */
-    @Value("${cloud-storage.s3.bucket-name}")
+    @Value("${cloud-storage.bucket-name}")
     private String bucketName;
 
     /**
