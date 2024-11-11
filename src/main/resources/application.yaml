@@ -17,3 +17,6 @@ cloud-storage:
     access-key:
     secret-key:
     region:
+
+jwt:
+  secret-key:
