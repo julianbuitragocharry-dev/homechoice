@@ -1,7 +1,7 @@
 package com.homechoice.controller.property;
 
 import com.homechoice.dto.property.PropertyDTO;
-import com.homechoice.response.ApiResponse;
+import com.homechoice.dto.MessageResponse;
 import com.homechoice.service.property.PropertyService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -93,21 +94,33 @@ public class PropertyController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<ApiResponse> updateProperty(@PathVariable Integer id, @RequestBody PropertyDTO request) {
+    public MessageResponse updateProperty(@PathVariable Integer id, @RequestBody PropertyDTO request) {
         propertyService.update(request, id);
-        return ResponseEntity.ok(new ApiResponse("Property updated"));
+        return new MessageResponse(
+                HttpStatus.OK.value(),
+                "Property updated successfully",
+                LocalDateTime.now()
+        );
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<ApiResponse> deleteProperty(@PathVariable Integer id) throws IOException {
+    public MessageResponse deleteProperty(@PathVariable Integer id) throws IOException {
         propertyService.delete(id);
-        return ResponseEntity.ok(new ApiResponse("Property deleted"));
+        return new MessageResponse(
+                HttpStatus.OK.value(),
+                "Property deleted successfully",
+                LocalDateTime.now()
+        );
     }
 
     @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     @PutMapping("{id}/user/{agentId}")
-    public ResponseEntity<ApiResponse> updateUserProperty(@PathVariable Integer id, @PathVariable Integer agentId) {
+    public MessageResponse updateUserProperty(@PathVariable Integer id, @PathVariable Integer agentId) {
         propertyService.setAgent(id, agentId);
-        return ResponseEntity.ok(new ApiResponse("Agent " + agentId + " has been assigned to this property"));
+        return new MessageResponse(
+                HttpStatus.OK.value(),
+                "Agent" + agentId + " has been assigned to this property",
+                LocalDateTime.now()
+        );
     }
 }

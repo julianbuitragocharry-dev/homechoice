@@ -17,10 +17,9 @@ src/
         └── com.homechoice/
             ├── aws/                     // Module for AWS integrations (S3 Bucket).
             ├── controller/              // Contains controllers (endpoints) that expose the API.
-            ├── dto/                     // Contains Data Transfer Objects (DTOs), which are used for data transfer between layers.
+            ├── dto/                     // Contains Data Transfer Objects, which are used for data transfer.
             ├── model/                   // Contains data model entities representing database tables.
             ├── repository/              // Interfaces extending JpaRepository to interact with the database.
-            ├── response/                // Classes to structure API responses.
             ├── security/                // Security module containing authentication and authorization configurations.
             │   ├── auth/                // Classes related to authentication, such as the authentication controller.
             │   ├── config/              // Security configurations, including CORS and authorization rules.
@@ -29,7 +28,7 @@ src/
             └── HomechoiceApplication    // Main class that starts the Spring Boot application.      
     └── resources/                       // Configuration files and static resources.
         ├── application.yaml             // Main configuration file for Spring Boot.
-        └── import.sql                   // SQL file for initializing the database with sample data or necessary tables.
+        └── import.sql                   // SQL file for initializing the database.
 ```
 
 ## API Documentation

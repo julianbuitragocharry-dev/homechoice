@@ -4,7 +4,7 @@ import com.homechoice.dto.user.AgentDTO;
 import com.homechoice.dto.user.AgentResponseDTO;
 import com.homechoice.dto.user.UserDTO;
 import com.homechoice.dto.user.UserResponseDTO;
-import com.homechoice.response.ApiResponse;
+import com.homechoice.dto.MessageResponse;
 import com.homechoice.service.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("api/users")
@@ -78,29 +80,45 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     @PutMapping("{id}")
-    public ResponseEntity<ApiResponse> updateUser(@PathVariable Integer id, @RequestBody UserDTO request) {
+    public MessageResponse updateUser(@PathVariable Integer id, @RequestBody UserDTO request) {
         userService.updateUser(request, id);
-        return ResponseEntity.ok(new ApiResponse("User updated"));
+        return new MessageResponse(
+                HttpStatus.OK.value(),
+                "User updated successfully",
+                LocalDateTime.now()
+        );
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("agents/{id}")
-    public ResponseEntity<ApiResponse> updateAgent(@PathVariable Integer id, @RequestBody AgentDTO request) {
+    public MessageResponse updateAgent(@PathVariable Integer id, @RequestBody AgentDTO request) {
         userService.updateAgent(request, id);
-        return ResponseEntity.ok(new ApiResponse("Agent updated"));
+        return new MessageResponse(
+                HttpStatus.OK.value(),
+                "Agent updated successfully",
+                LocalDateTime.now()
+        );
     }
 
     @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     @DeleteMapping("{id}")
-    public ResponseEntity<ApiResponse> deleteUser(@PathVariable Integer id) {
+    public MessageResponse deleteUser(@PathVariable Integer id) {
         userService.deleteUser(id);
-        return ResponseEntity.ok(new ApiResponse("User deleted"));
+        return new MessageResponse(
+                HttpStatus.OK.value(),
+                "User deleted successfully",
+                LocalDateTime.now()
+        );
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("agents/{id}")
-    public ResponseEntity<ApiResponse> deleteAgent(@PathVariable Integer id) {
+    public MessageResponse deleteAgent(@PathVariable Integer id) {
         userService.deleteAgent(id);
-        return ResponseEntity.ok(new ApiResponse("Agent deleted"));
+        return new MessageResponse(
+                HttpStatus.OK.value(),
+                "Agent deleted successfully",
+                LocalDateTime.now()
+        );
     }
 }
