@@ -34,6 +34,7 @@ public class S3Config {
 
     /**
      * Creates and configures an S3Client bean.
+     *
      * @return Configured {@link S3Client} instance.
      */
     @Bean
@@ -46,6 +47,7 @@ public class S3Config {
 
     /**
      * Builds AWS credentials using access and secret keys.
+     *
      * @return Configured {@link AwsBasicCredentials} instance with configured access and secret keys.
      */
     private AwsBasicCredentials awsCredentials() {
