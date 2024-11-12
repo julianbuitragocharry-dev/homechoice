@@ -16,11 +16,16 @@ spring:
         secret-key:
         access-key:
       region:
-        static: us-east-2
-
+        static:
 
 cloud-storage:
     bucket-name:
 
 jwt:
   secret-key:
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
