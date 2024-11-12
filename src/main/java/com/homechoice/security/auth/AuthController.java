@@ -31,7 +31,7 @@ public class AuthController {
     }
 
     @GetMapping("/roles")
-    public ResponseEntity<List<String>> getRoles() {
-        return ResponseEntity.ok(authService.getAuthenticatedUserRoles());
+    public List<String> getRoles() {
+        return authService.getAuthenticatedUserRoles();
     }
 }

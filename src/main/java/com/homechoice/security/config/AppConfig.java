@@ -1,6 +1,9 @@
 package com.homechoice.security.config;
 
 import com.homechoice.repository.user.UserRepository;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -70,5 +73,27 @@ public class AppConfig {
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
+    }
+
+    /**
+     * Bean configuration for OpenAPI.
+     * This method sets up the metadata for the Swagger UI documentation.
+     * It defines the title, version, description, terms of service, and support contact
+     * that will be displayed in the Swagger UI interface.
+     *
+     * @return OpenAPI object containing the configured metadata.
+     */
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("HOMECHOICE API")
+                        .version("1.0")
+                        .description("API for property management, users, and more.")
+                        .termsOfService("https://www.swagger.io/terms")
+                        .contact(new Contact()
+                                .name("HomeChoice Support")
+                                .email("u20231211839@usco.edu.co"))
+                );
     }
 }
