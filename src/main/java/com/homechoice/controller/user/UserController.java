@@ -35,13 +35,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("public/agents/{id}")
-    @Operation(summary = "Get agent by ID",
-            description = "Retrieves agent information by their ID.")
-    public AgentResponseDTO getAgentById(@PathVariable Integer id) {
-        return userService.getAgentById(id);
-    }
-
     @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     @GetMapping
     @Operation(summary = "Get all users",
@@ -53,19 +46,6 @@ public class UserController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         return userService.getAllUsers(nit, pageable);
-    }
-
-    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
-    @GetMapping("agents")
-    @Operation(summary = "Get all agents",
-            description = "Retrieves a paginated list of all agents with optional NIT filter.")
-    public Page<?> getAllAgents(
-            @RequestParam(required = false) String nit,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "6") Integer size
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
-        return userService.getAllAgents(nit, pageable);
     }
 
     @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
@@ -85,15 +65,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("agents")
-    @Operation(summary = "Create a new agent",
-            description = "Creates a new agent with the provided data.")
-    public ResponseEntity<UserResponseDTO> createAgent(@RequestBody AgentDTO dto) {
-        UserResponseDTO response = userService.createAgent(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
     @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     @PutMapping("{id}")
     @Operation(summary = "Update a user",
@@ -107,19 +78,6 @@ public class UserController {
         );
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PutMapping("agents/{id}")
-    @Operation(summary = "Update an agent",
-            description = "Updates an existing agent with the provided data by their ID.")
-    public MessageResponse updateAgent(@PathVariable Integer id, @RequestBody AgentDTO request) {
-        userService.updateAgent(request, id);
-        return new MessageResponse(
-                HttpStatus.OK.value(),
-                "Agent updated successfully",
-                LocalDateTime.now()
-        );
-    }
-
     @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     @DeleteMapping("{id}")
     @Operation(summary = "Delete a user",
@@ -129,6 +87,48 @@ public class UserController {
         return new MessageResponse(
                 HttpStatus.OK.value(),
                 "User deleted successfully",
+                LocalDateTime.now()
+        );
+    }
+
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
+    @GetMapping("agents")
+    @Operation(summary = "Get all agents",
+            description = "Retrieves a paginated list of all agents with optional NIT filter.")
+    public Page<?> getAllAgents(
+            @RequestParam(required = false) String nit,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "6") Integer size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userService.getAllAgents(nit, pageable);
+    }
+
+    @GetMapping("public/agents/{id}")
+    @Operation(summary = "Get agent by ID",
+            description = "Retrieves agent information by their ID.")
+    public AgentResponseDTO getAgentById(@PathVariable Integer id) {
+        return userService.getAgentById(id);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("agents")
+    @Operation(summary = "Create a new agent",
+            description = "Creates a new agent with the provided data.")
+    public ResponseEntity<UserResponseDTO> createAgent(@RequestBody AgentDTO dto) {
+        UserResponseDTO response = userService.createAgent(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("agents/{id}")
+    @Operation(summary = "Update an agent",
+            description = "Updates an existing agent with the provided data by their ID.")
+    public MessageResponse updateAgent(@PathVariable Integer id, @RequestBody AgentDTO request) {
+        userService.updateAgent(request, id);
+        return new MessageResponse(
+                HttpStatus.OK.value(),
+                "Agent updated successfully",
                 LocalDateTime.now()
         );
     }

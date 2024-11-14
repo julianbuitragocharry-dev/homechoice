@@ -144,16 +144,19 @@ public class PropertyService {
     }
 
     /**
-     * Creates a new property and uploads images to S3.
+     * Creates a new property and uploads associated images to AWS S3.
      *
-     * @param dto     property data transfer object
-     * @param images  list of images to upload
-     * @return the created property DTO
-     * @throws IOException if an error occurs during image upload
+     * @param dto     A {@link PropertyDTO} containing the data for the property to be created.
+     * @param images  A {@link List} of {@link MultipartFile} representing images to upload to S3.
+     * @return        A {@link PropertyDTO} representing the newly created property, including
+     *                the S3 image paths and agent ID.
+     * @throws IOException If an error occurs during the image upload process to S3.
      */
     public PropertyDTO create(PropertyDTO dto, List<MultipartFile> images) throws IOException {
         List<String> imagePaths = s3Service.uploadFiles(images);
+        Integer id = authService.getAuthenticatedUserId();
         dto.setImages(imagePaths);
+        dto.setAgent(id);
 
         Property property = toEntity(dto);
         propertyRepository.save(property);

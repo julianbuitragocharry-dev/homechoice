@@ -38,26 +38,6 @@ public class UserService {
     private final AuthService authService;
 
     /**
-     * Retrieves an agent by ID. Throws an exception if the user is not an agent.
-     *
-     * @param id the ID of the agent
-     * @return AgentResponseDTO containing agent information
-     * @throws IllegalArgumentException if the user is not an agent
-     */
-    public AgentResponseDTO getAgentById(Integer id) {
-        User user = findById(id);
-
-        boolean isAgent = user.getRoles().stream()
-                .anyMatch(rol -> rol.getRol().equals("AGENT"));
-
-        if (!isAgent) {
-            throw new IllegalArgumentException("User is not an agent");
-        }
-
-        return toAgentDTO(findById(id));
-    }
-
-    /**
      * Retrieves a paginated list of all users. Filters by NIT if provided.
      * Only accessible by SUPER_ADMIN.
      *
@@ -69,21 +49,6 @@ public class UserService {
         Integer authenticatedId = authService.getAuthenticatedUserId();
         if (nit != null) { nit = "%" + nit + "%"; }
         return userRepository.findAll(nit, authenticatedId, pageable)
-                .map(this::toResponseDTO);
-    }
-
-    /**
-     * Retrieves a paginated list of all agents. Filters by NIT if provided.
-     * Only accessible by ADMIN.
-     *
-     * @param nit the NIT filter (can be null)
-     * @param pageable pagination details
-     * @return a paginated list of UserResponseDTOs for agents
-     */
-    public Page<UserResponseDTO> getAllAgents(String nit, Pageable pageable) {
-        Integer authenticatedId = authService.getAuthenticatedUserId();
-        if (nit != null) { nit = "%" + nit + "%"; }
-        return userRepository.findByRolesRol("AGENT", nit, authenticatedId, pageable)
                 .map(this::toResponseDTO);
     }
 
@@ -106,22 +71,6 @@ public class UserService {
      */
     public UserResponseDTO createUser(UserDTO dto) {
         User user = toEntity(dto);
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
-
-        userRepository.save(user);
-        return toResponseDTO(user);
-    }
-
-    /**
-     * Creates a new agent with the "AGENT" role. Only accessible by ADMIN.
-     *
-     * @param dto AgentDTO containing agent details
-     * @return UserResponseDTO of the created agent
-     */
-    public UserResponseDTO createAgent(AgentDTO dto) {
-        User user = toEntity(dto);
-        List<String> roles = Collections.singletonList("AGENT");
-        user.setRoles(rolService.getByRolesNames(roles));
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         userRepository.save(user);
@@ -163,6 +112,70 @@ public class UserService {
     }
 
     /**
+     * Deletes a user by ID. Removes their properties if they are assigned any.
+     * Only accessible by SUPER_ADMIN.
+     *
+     * @param id the ID of the user to delete
+     */
+    public void deleteUser(Integer id) {
+        User user = findById(id);
+
+        removeProperties(user);
+        userRepository.deleteById(id);
+    }
+
+    /**
+     * Retrieves a paginated list of all agents. Filters by NIT if provided.
+     * Only accessible by ADMIN.
+     *
+     * @param nit the NIT filter (can be null)
+     * @param pageable pagination details
+     * @return a paginated list of UserResponseDTOs for agents
+     */
+    public Page<UserResponseDTO> getAllAgents(String nit, Pageable pageable) {
+        Integer authenticatedId = authService.getAuthenticatedUserId();
+        if (nit != null) { nit = "%" + nit + "%"; }
+        return userRepository.findByRolesRol("AGENT", nit, authenticatedId, pageable)
+                .map(this::toResponseDTO);
+    }
+
+    /**
+     * Retrieves an agent by ID. Throws an exception if the user is not an agent.
+     *
+     * @param id the ID of the agent
+     * @return AgentResponseDTO containing agent information
+     * @throws IllegalArgumentException if the user is not an agent
+     */
+    public AgentResponseDTO getAgentById(Integer id) {
+        User user = findById(id);
+
+        boolean isAgent = user.getRoles().stream()
+                .anyMatch(rol -> rol.getRol().equals("AGENT"));
+
+        if (!isAgent) {
+            throw new IllegalArgumentException("User is not an agent");
+        }
+
+        return toAgentDTO(findById(id));
+    }
+
+    /**
+     * Creates a new agent with the "AGENT" role. Only accessible by ADMIN.
+     *
+     * @param dto AgentDTO containing agent details
+     * @return UserResponseDTO of the created agent
+     */
+    public UserResponseDTO createAgent(AgentDTO dto) {
+        User user = toEntity(dto);
+        List<String> roles = Collections.singletonList("AGENT");
+        user.setRoles(rolService.getByRolesNames(roles));
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+
+        userRepository.save(user);
+        return toResponseDTO(user);
+    }
+
+    /**
      * Updates an agent's information. Only accessible by ADMIN.
      *
      * @param dto AgentDTO with updated agent information
@@ -193,19 +206,6 @@ public class UserService {
     }
 
     /**
-     * Deletes a user by ID. Removes their properties if they are assigned any.
-     * Only accessible by SUPER_ADMIN.
-     *
-     * @param id the ID of the user to delete
-     */
-    public void deleteUser(Integer id) {
-        User user = findById(id);
-
-        removeProperties(user);
-        userRepository.deleteById(id);
-    }
-
-    /**
      * Deletes an agent by ID. Removes their properties if they are assigned any.
      * Only accessible by ADMIN.
      *
@@ -215,7 +215,7 @@ public class UserService {
     public void deleteAgent(Integer id) {
         User user = findById(id);
         boolean isAgent = user.getRoles().stream()
-                        .anyMatch(rol -> rol.getRol().equals("AGENT"));
+                .anyMatch(rol -> rol.getRol().equals("AGENT"));
 
         if (!isAgent) {
             throw new EntityNotFoundException("Agent not found");
