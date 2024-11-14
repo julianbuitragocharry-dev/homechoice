@@ -4,7 +4,6 @@ import com.homechoice.security.jwt.JwtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,20 +21,20 @@ public class AuthController {
     private final AuthService authService;
     private final JwtService jwtService;
 
-    @PostMapping("/login")
+    @PostMapping("login")
     @Operation(summary = "Login", description = "Authenticate the user and return a JWT token.")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    public AuthResponse login(@RequestBody LoginRequest request) {
+        return authService.login(request);
     }
 
-    @PostMapping("/verify-token")
+    @PostMapping("verify-token")
     @Operation(summary = "Verify Token", description = "Verify if the provided JWT token is expired or valid.")
     public boolean verifyToken(@RequestBody TokenRequest tokenRequest) {
         String token = tokenRequest.getToken();
         return !jwtService.isTokenExpired(token);
     }
 
-    @GetMapping("/roles")
+    @GetMapping("roles")
     @Operation(summary = "Get Roles", description = "Retrieve the roles of the currently authenticated user.")
     public List<String> getRoles() {
         return authService.getAuthenticatedUserRoles();

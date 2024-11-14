@@ -1,16 +1,23 @@
 package com.homechoice.security.auth;
 
+import com.homechoice.dto.MessageResponse;
 import com.homechoice.model.user.User;
 import com.homechoice.repository.user.UserRepository;
 import com.homechoice.security.jwt.JwtService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,17 +32,24 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     /**
-     * Authenticates a user with their email and password, generates a JWT token, and returns the token in an {@link AuthResponse}.
+     * Authenticates a user with email and password, generates a JWT token if successful, and returns it in an {@link AuthResponse}.
+     * <p>
+     * If authentication fails or the user is not found, a {@link BadCredentialsException} is thrown.
      *
-     * @param request The login request containing the email and password of the user.
-     * @return An {@link AuthResponse} containing the JWT token for the authenticated user.
+     * @param request The login request containing the user's email and password.
+     * @return An {@link AuthResponse} with the JWT token.
+     * @throws BadCredentialsException If authentication fails or the user does not exist.
      */
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        UserDetails user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new BadCredentialsException("Invalid email!"));
 
-        UserDetails user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Invalid password!");
+        }
 
         String token = jwtService.getToken(user);
 
@@ -72,4 +86,6 @@ public class AuthService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
     }
+
+
 }
