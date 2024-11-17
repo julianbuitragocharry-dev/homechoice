@@ -49,7 +49,7 @@ public class S3Service {
 
             return "https://" + bucketName + ".s3.us-east-2.amazonaws.com/" + fileName.replace(" ", "%20");
         } catch (Exception e) {
-            throw new IOException("Error uploading file: " + e.getMessage());
+            throw new IOException("Error uploading file");
         }
     }
 
@@ -71,7 +71,7 @@ public class S3Service {
 
             s3Client.deleteObject(deleteObjectRequest);
         } catch (Exception e) {
-            throw new IOException("Error deleting file: " + e.getMessage(), e);
+            throw new IOException("Error deleting file");
         }
     }
 

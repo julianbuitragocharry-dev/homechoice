@@ -15,4 +15,6 @@ public class AuthResponse {
 
     @Schema(description = "JWT token for accessing secured endpoints", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
     String token;
+
+    String user;
 }

@@ -8,6 +8,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
@@ -17,7 +18,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR.value())
             .body(new MessageResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                e.getMessage(),
+        "An unexpected error occurred!",
                 LocalDateTime.now())
             );
     }
@@ -40,5 +41,25 @@ public class GlobalExceptionHandler {
                 e.getMessage(),
                 LocalDateTime.now())
             );
+    }
+
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<MessageResponse> handleIOException(IOException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value())
+            .body(new MessageResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                    e.getMessage(),
+                    LocalDateTime.now())
+            );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<MessageResponse> handleIOException(IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value())
+                .body(new MessageResponse(
+                        HttpStatus.BAD_REQUEST.value(),
+                        e.getMessage(),
+                        LocalDateTime.now())
+                );
     }
 }

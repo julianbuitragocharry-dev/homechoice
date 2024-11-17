@@ -1,23 +1,17 @@
 package com.homechoice.security.auth;
 
-import com.homechoice.dto.MessageResponse;
 import com.homechoice.model.user.User;
 import com.homechoice.repository.user.UserRepository;
 import com.homechoice.security.jwt.JwtService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +38,7 @@ public class AuthService {
      * @throws BadCredentialsException If authentication fails or the user does not exist.
      */
     public AuthResponse login(LoginRequest request) {
-        UserDetails user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BadCredentialsException("Invalid email!"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -55,6 +49,7 @@ public class AuthService {
 
         return AuthResponse.builder()
                 .token(token)
+                .user(user.getFirstName())
                 .build();
     }
 
