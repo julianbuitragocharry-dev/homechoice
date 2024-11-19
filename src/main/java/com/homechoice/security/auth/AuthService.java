@@ -81,6 +81,4 @@ public class AuthService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
     }
-
-
 }
