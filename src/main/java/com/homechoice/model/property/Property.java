@@ -1,5 +1,6 @@
 package com.homechoice.model.property;
 
+import com.homechoice.audit.model.Auditable;
 import com.homechoice.model.user.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.CascadeType;
@@ -30,7 +31,7 @@ import java.util.List;
 @Builder
 @Table(name = "property")
 @Schema(description = "Represents a real estate property in the system.")
-public class Property {
+public class Property extends Auditable<String> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

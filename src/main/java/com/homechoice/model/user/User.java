@@ -1,5 +1,6 @@
 package com.homechoice.model.user;
 
+import com.homechoice.audit.model.Auditable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 @Builder
 @Table(name = "users")
 @Schema(description = "Represents a user in the system with their personal information details.")
-public class User implements UserDetails {
+public class User extends Auditable<String> implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
