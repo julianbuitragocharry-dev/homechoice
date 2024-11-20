@@ -22,30 +22,29 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service for managing user and agent data and operations, such as retrieving,
+ * creating, updating, and deleting users, as well as encoding passwords
+ * and assigning properties.
+ */
 @Service
 @AllArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
     private final PropertyRepository propertyRepository;
     private final RolService rolService;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
 
-    // PUBLIC
-    public AgentResponseDTO getAgentById(Integer id) {
-        User user = findById(id);
-
-        boolean isAgent = user.getRoles().stream()
-                .anyMatch(rol -> rol.getRol().equals("AGENT"));
-
-        if (!isAgent) {
-            throw new IllegalArgumentException("User is not an agent");
-        }
-
-        return toAgentDTO(findById(id));
-    }
-
-    // SUPER_ADMIN
+    /**
+     * Retrieves a paginated list of all users. Filters by NIT if provided.
+     * Only accessible by SUPER_ADMIN.
+     *
+     * @param nit the NIT filter (can be null)
+     * @param pageable pagination details
+     * @return a paginated list of UserResponseDTOs
+     */
     public Page<UserResponseDTO> getAllUsers(String nit, Pageable pageable) {
         Integer authenticatedId = authService.getAuthenticatedUserId();
         if (nit != null) { nit = "%" + nit + "%"; }
@@ -53,21 +52,23 @@ public class UserService {
                 .map(this::toResponseDTO);
     }
 
-    // ADMIN
-    public Page<UserResponseDTO> getAllAgents(String nit, Pageable pageable) {
-        Integer authenticatedId = authService.getAuthenticatedUserId();
-        if (nit != null) { nit = "%" + nit + "%"; }
-        return userRepository.findByRolesRol("AGENT", nit, authenticatedId, pageable)
-                .map(this::toResponseDTO);
-    }
-
-    // ADMIN AND SUPER_ADMIN
+    /**
+     * Retrieves a user by ID. Accessible by both ADMIN and SUPER_ADMIN.
+     *
+     * @param id the ID of the user
+     * @return UserDTO containing user information
+     */
     public UserDTO getUserById(Integer id) {
         User user = findById(id);
         return toDTO(user);
     }
 
-    // SUPER_ADMIN
+    /**
+     * Creates a new user. Only accessible by SUPER_ADMIN.
+     *
+     * @param dto UserDTO containing user details
+     * @return UserResponseDTO of the created user
+     */
     public UserResponseDTO createUser(UserDTO dto) {
         User user = toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -76,18 +77,13 @@ public class UserService {
         return toResponseDTO(user);
     }
 
-    // ADMIN
-    public UserResponseDTO createAgent(AgentDTO dto) {
-        User user = toEntity(dto);
-        List<String> roles = Collections.singletonList("AGENT");
-        user.setRoles(rolService.getByRolesNames(roles));
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
-
-        userRepository.save(user);
-        return toResponseDTO(user);
-    }
-
-    // SUPER_ADMIN
+    /**
+     * Updates a user's information, including roles. Removes properties from
+     * the user if they lose the "AGENT" role. Only accessible by SUPER_ADMIN.
+     *
+     * @param dto UserDTO with updated user information
+     * @param id the ID of the user to update
+     */
     public void updateUser(UserDTO dto, Integer id) {
         User user = findById(id);
 
@@ -115,7 +111,77 @@ public class UserService {
         userRepository.save(user);
     }
 
-    //ADMIN
+    /**
+     * Deletes a user by ID. Removes their properties if they are assigned any.
+     * Only accessible by SUPER_ADMIN.
+     *
+     * @param id the ID of the user to delete
+     */
+    public void deleteUser(Integer id) {
+        User user = findById(id);
+
+        removeProperties(user);
+        userRepository.deleteById(id);
+    }
+
+    /**
+     * Retrieves a paginated list of all agents. Filters by NIT if provided.
+     * Only accessible by ADMIN.
+     *
+     * @param nit the NIT filter (can be null)
+     * @param pageable pagination details
+     * @return a paginated list of UserResponseDTOs for agents
+     */
+    public Page<UserResponseDTO> getAllAgents(String nit, Pageable pageable) {
+        Integer authenticatedId = authService.getAuthenticatedUserId();
+        if (nit != null) { nit = "%" + nit + "%"; }
+        return userRepository.findByRolesRol("AGENT", nit, authenticatedId, pageable)
+                .map(this::toResponseDTO);
+    }
+
+    /**
+     * Retrieves an agent by ID. Throws an exception if the user is not an agent.
+     *
+     * @param id the ID of the agent
+     * @return AgentResponseDTO containing agent information
+     * @throws IllegalArgumentException if the user is not an agent
+     */
+    public AgentResponseDTO getAgentById(Integer id) {
+        User user = findById(id);
+
+        boolean isAgent = user.getRoles().stream()
+                .anyMatch(rol -> rol.getRol().equals("AGENT"));
+
+        if (!isAgent) {
+            throw new IllegalArgumentException("User is not an agent");
+        }
+
+        return toAgentDTO(findById(id));
+    }
+
+    /**
+     * Creates a new agent with the "AGENT" role. Only accessible by ADMIN.
+     *
+     * @param dto AgentDTO containing agent details
+     * @return UserResponseDTO of the created agent
+     */
+    public UserResponseDTO createAgent(AgentDTO dto) {
+        User user = toEntity(dto);
+        List<String> roles = Collections.singletonList("AGENT");
+        user.setRoles(rolService.getByRolesNames(roles));
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+
+        userRepository.save(user);
+        return toResponseDTO(user);
+    }
+
+    /**
+     * Updates an agent's information. Only accessible by ADMIN.
+     *
+     * @param dto AgentDTO with updated agent information
+     * @param id the ID of the agent to update
+     * @throws EntityNotFoundException if the user is not an agent
+     */
     public void updateAgent(AgentDTO dto, Integer id) {
         User user = findById(id);
         boolean isAgent = user.getRoles().stream()
@@ -139,19 +205,17 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // SUPER_ADMIN
-    public void deleteUser(Integer id) {
-        User user = findById(id);
-
-        removeProperties(user);
-        userRepository.deleteById(id);
-    }
-
-    // ADMIN
+    /**
+     * Deletes an agent by ID. Removes their properties if they are assigned any.
+     * Only accessible by ADMIN.
+     *
+     * @param id the ID of the agent to delete
+     * @throws EntityNotFoundException if the user is not an agent
+     */
     public void deleteAgent(Integer id) {
         User user = findById(id);
         boolean isAgent = user.getRoles().stream()
-                        .anyMatch(rol -> rol.getRol().equals("AGENT"));
+                .anyMatch(rol -> rol.getRol().equals("AGENT"));
 
         if (!isAgent) {
             throw new EntityNotFoundException("Agent not found");
@@ -169,11 +233,23 @@ public class UserService {
         }
     }
 
+    /**
+     * Finds a user by ID.
+     *
+     * @param id the ID of the user
+     * @return the User entity
+     * @throws EntityNotFoundException if the user is not found
+     */
     public User findById(Integer id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 
+    /**
+     * Removes all properties assigned to a user.
+     *
+     * @param user the User whose properties are to be removed
+     */
     private void removeProperties(User user) {
         List<Property> properties = propertyRepository.findByAgent(user);
         for (Property property : properties) {
@@ -182,6 +258,12 @@ public class UserService {
         }
     }
 
+    /**
+     * Converts a User entity to a UserResponseDTO.
+     *
+     * @param user the User entity to convert
+     * @return a UserResponseDTO containing the user's details
+     */
     private UserResponseDTO toResponseDTO(User user) {
         return UserResponseDTO.builder()
                 .id(user.getId())
@@ -194,7 +276,14 @@ public class UserService {
                 .build();
     }
 
-    private UserDTO toDTO(User user) {
+    /**
+     * Converts a User entity to a UserDTO.
+     * The password is set to an empty string for security purposes.
+     *
+     * @param user the User entity to convert
+     * @return a UserDTO containing the user's details, excluding the password
+     */
+    public UserDTO toDTO(User user) {
         return UserDTO.builder()
                 .id(user.getId())
                 .firstName(user.getFirstName())
@@ -208,6 +297,13 @@ public class UserService {
                 .build();
     }
 
+    /**
+     * Converts a User entity to an AgentResponseDTO.
+     * The response includes the agent's name, email, and phone.
+     *
+     * @param user the User entity to convert
+     * @return an AgentResponseDTO containing the agent's name, email, and phone
+     */
     private AgentResponseDTO toAgentDTO(User user) {
         return AgentResponseDTO.builder()
                 .name(user.getFirstName() + " " + user.getLastName())
@@ -216,6 +312,13 @@ public class UserService {
                 .build();
     }
 
+    /**
+     * Converts a UserDTO to a User entity.
+     * The entity is populated with data from the DTO, including the roles.
+     *
+     * @param dto the UserDTO containing the user's details
+     * @return a User entity with data from the DTO
+     */
     private User toEntity(UserDTO dto) {
         return User.builder()
                 .firstName(dto.getFirstName())
@@ -229,6 +332,13 @@ public class UserService {
                 .build();
     }
 
+    /**
+     * Converts an AgentDTO to a User entity.
+     * The entity is populated with data from the AgentDTO.
+     *
+     * @param dto the AgentDTO containing the agent's details
+     * @return a User entity with data from the AgentDTO
+     */
     private User toEntity(AgentDTO dto) {
         return User.builder()
                 .firstName(dto.getFirstName())

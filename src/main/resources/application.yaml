@@ -2,18 +2,29 @@ spring:
   application:
     name: home_choice
   datasource:
-    url: jdbc:postgresql://localhost:5432/home_choice
-    username: postgres
-    password: postgres
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
   cloud:
     aws:
       credentials:
-        secret-key:
-        access-key:
+        secret-key: ${AWS_SECRET_KEY}
+        access-key: ${AWS_ACCESS_KEY}
       region:
-        static: us-east-2
+        static: ${AWS_REGION}
+
+cloud-storage:
+    bucket-name: ${AWS_BUCKET_NAME}
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true

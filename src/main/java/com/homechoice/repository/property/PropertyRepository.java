@@ -12,8 +12,25 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * Repository for accessing the {@link Property} entity in the database.
+ * Provides methods for retrieving properties with custom filtering and pagination based on various criteria such as name, status, price, area, type, concept, and agent.
+ */
 @Repository
 public interface PropertyRepository extends JpaRepository<Property, Integer> {
+
+    /**
+     * Finds all properties based on the provided filters and pagination.
+     *
+     * @param name Name of the property (optional).
+     * @param status Status of the property (optional).
+     * @param minPrice Minimum price of the property (optional).
+     * @param minArea Minimum area of the property (optional).
+     * @param type Type of the property (optional).
+     * @param concept Concept of the property (optional).
+     * @param pageable Pagination information.
+     * @return A page of properties that match the provided filters.
+     */
     @Query("SELECT p FROM Property p " +
             "JOIN p.type t " +
             "JOIN p.concept c " +
@@ -33,6 +50,18 @@ public interface PropertyRepository extends JpaRepository<Property, Integer> {
             @Param("concept") String concept,
             Pageable pageable);
 
+    /**
+     * Finds properties where the agent is null based on the provided filters and pagination.
+     *
+     * @param name Name of the property (optional).
+     * @param status Status of the property (optional).
+     * @param minPrice Minimum price of the property (optional).
+     * @param minArea Minimum area of the property (optional).
+     * @param type Type of the property (optional).
+     * @param concept Concept of the property (optional).
+     * @param pageable Pagination information.
+     * @return A page of properties with no assigned agent that match the provided filters.
+     */
     @Query("SELECT p FROM Property p " +
             "JOIN p.type t " +
             "JOIN p.concept c " +
@@ -52,6 +81,19 @@ public interface PropertyRepository extends JpaRepository<Property, Integer> {
             @Param("concept") String concept,
             Pageable pageable);
 
+    /**
+     * Finds properties assigned to a specific agent based on the provided filters and pagination.
+     *
+     * @param name Name of the property (optional).
+     * @param status Status of the property (optional).
+     * @param minPrice Minimum price of the property (optional).
+     * @param minArea Minimum area of the property (optional).
+     * @param type Type of the property (optional).
+     * @param concept Concept of the property (optional).
+     * @param agentId The ID of the agent whose properties to retrieve.
+     * @param pageable Pagination information.
+     * @return A page of properties assigned to the specified agent that match the provided filters.
+     */
     @Query("SELECT p FROM Property p " +
             "JOIN p.type t " +
             "JOIN p.concept c " +
@@ -73,5 +115,11 @@ public interface PropertyRepository extends JpaRepository<Property, Integer> {
             Pageable pageable
     );
 
+    /**
+     * Finds all properties assigned to a specific agent.
+     *
+     * @param user The agent whose properties to retrieve.
+     * @return A list of properties assigned to the specified agent.
+     */
     List<Property> findByAgent(User user);
 }
