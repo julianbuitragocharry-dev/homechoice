@@ -283,7 +283,7 @@ public class UserService {
      * @param user the User entity to convert
      * @return a UserDTO containing the user's details, excluding the password
      */
-    private UserDTO toDTO(User user) {
+    public UserDTO toDTO(User user) {
         return UserDTO.builder()
                 .id(user.getId())
                 .firstName(user.getFirstName())

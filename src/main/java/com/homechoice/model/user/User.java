@@ -1,9 +1,11 @@
 package com.homechoice.model.user;
 
 import com.homechoice.audit.model.Auditable;
+import com.homechoice.audit.service.HistoryUserListener;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
+@EntityListeners(HistoryUserListener.class)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
