@@ -8,24 +8,50 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
+/**
+ * Configuration class for AWS S3 client.
+ * Sets up an S3Client bean with the necessary credentials and region.
+ */
 @Configuration
 public class S3Config {
+
+    /**
+     * AWS Access Key for authentication.
+     */
     @Value("${spring.cloud.aws.credentials.access-key}")
     private String accessKey;
 
+    /**
+     * AWS Access Key for authentication.
+     */
     @Value("${spring.cloud.aws.credentials.secret-key}")
     private String secretKey;
 
+    /**
+     * AWS region for the S3 client.
+     */
     @Value("${spring.cloud.aws.region.static}")
     private String region;
 
+    /**
+     * Creates and configures an S3Client bean.
+     *
+     * @return Configured {@link S3Client} instance.
+     */
     @Bean
     public S3Client s3Client() {
-        AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
-
         return S3Client.builder()
                 .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                .credentialsProvider(StaticCredentialsProvider.create(awsCredentials()))
                 .build();
+    }
+
+    /**
+     * Builds AWS credentials using access and secret keys.
+     *
+     * @return Configured {@link AwsBasicCredentials} instance with configured access and secret keys.
+     */
+    private AwsBasicCredentials awsCredentials() {
+        return AwsBasicCredentials.create(accessKey, secretKey);
     }
 }

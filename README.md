@@ -1,4 +1,4 @@
-# HomeChoice Backend
+# HomeChoice API
 The backend service for the HomeChoice real estate management system. This service is built with Spring Boot and provides functionalities to manage properties, users, and roles within a real estate agency. It includes a hierarchical role-based access control (RBAC) system to manage user permissions and resource access.
 
 ## Technologies Used
@@ -18,6 +18,7 @@ src/
             ├── aws/                     // Module for AWS integrations (S3 Bucket).
             ├── controller/              // Contains controllers (endpoints) that expose the API.
             ├── dto/                     // Contains Data Transfer Objects, which are used for data transfer.
+            ├── exception                // Central exception interceptor.
             ├── model/                   // Contains data model entities representing database tables.
             ├── repository/              // Interfaces extending JpaRepository to interact with the database.
             ├── security/                // Security module containing authentication and authorization configurations.
