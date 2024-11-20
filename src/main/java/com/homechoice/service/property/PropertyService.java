@@ -286,7 +286,7 @@ public class PropertyService {
      * @param property the Property entity
      * @return the property data transfer object
      */
-    private PropertyDTO toDTO(Property property) {
+    public PropertyDTO toDTO(Property property) {
         return PropertyDTO.builder()
                 .id(property.getId())
                 .name(property.getName())

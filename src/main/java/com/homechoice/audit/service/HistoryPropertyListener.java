@@ -1,10 +1,10 @@
 package com.homechoice.audit.service;
 
-import com.homechoice.audit.model.HistoryUser;
-import com.homechoice.audit.repository.HistoryUserRepository;
-import com.homechoice.dto.user.UserDTO;
-import com.homechoice.model.user.User;
-import com.homechoice.service.user.UserService;
+import com.homechoice.audit.model.HistoryProperty;
+import com.homechoice.audit.repository.HistoryPropertyRepository;
+import com.homechoice.dto.property.PropertyDTO;
+import com.homechoice.model.property.Property;
+import com.homechoice.service.property.PropertyService;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreRemove;
 import jakarta.persistence.PreUpdate;
@@ -18,32 +18,32 @@ import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor(onConstructor_ = @__(@Lazy))
-public class HistoryUserListener {
+public class HistoryPropertyListener {
 
-    private final HistoryUserRepository historyUserRepository;
-    private final UserService userService;
+    private final HistoryPropertyRepository historyPropertyRepository;
+    private final PropertyService propertyService;
 
     @PrePersist
-    public void logCreate(User entity) {
+    public void logCreate(Property entity) {
         saveHistory(entity, "CREATE", entity);
     }
 
     @PreUpdate
-    public void logUpdate(User entity) {
+    public void logUpdate(Property entity) {
         saveHistory(entity, "UPDATE", entity);
     }
 
     @PreRemove
-    public void logDelete(User entity) {
+    public void logDelete(Property entity) {
         saveHistory(entity, "DELETE", null);
     }
 
-    private void saveHistory(User entity, String action, User newData) {
+    private void saveHistory(Property entity, String action, Property newData) {
         try {
             Integer entityId = entity.getId();
             String changedBy = getCurrentUser();
 
-            HistoryUser history = HistoryUser.builder()
+            HistoryProperty history = HistoryProperty.builder()
                     .entityId(entityId)
                     .action(action)
                     .createBy(changedBy)
@@ -51,7 +51,7 @@ public class HistoryUserListener {
                     .createdAt(LocalDateTime.now())
                     .build();
 
-            historyUserRepository.save(history);
+            historyPropertyRepository.save(history);
         } catch (Exception e) {
             throw new RuntimeException();
         }
@@ -64,11 +64,11 @@ public class HistoryUserListener {
                 : "SYSTEM";
     }
 
-    private UserDTO toSimple(User entity) {
+    private PropertyDTO toSimple(Property entity) {
         if (entity == null) {
             return null;
         }
 
-        return userService.toDTO(entity);
+        return propertyService.toDTO(entity);
     }
 }

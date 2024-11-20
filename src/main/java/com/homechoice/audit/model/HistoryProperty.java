@@ -20,8 +20,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "history_users")
-public class HistoryUser {
+@Table(name = "history_properties")
+public class HistoryProperty {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
