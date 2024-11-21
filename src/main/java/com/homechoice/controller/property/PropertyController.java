@@ -3,8 +3,6 @@ package com.homechoice.controller.property;
 import com.homechoice.dto.property.PropertyDTO;
 import com.homechoice.dto.MessageResponse;
 import com.homechoice.service.property.PropertyService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +27,14 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Tag(name = "Property Management", description = "API for managing properties")
+/**
+ * Controller class for managing properties.
+ * This class provides endpoints for creating, updating, retrieving, and deleting properties.
+ *
+ * @see PropertyService
+ * @see PropertyDTO
+ * @see MessageResponse
+ */
 @RestController
 @RequestMapping("api/properties")
 @AllArgsConstructor
@@ -37,9 +42,21 @@ public class PropertyController {
 
     private final PropertyService propertyService;
 
+    /**
+     * Retrieves a paginated list of public properties based on filters.
+     *
+     * @param name the name filter (optional)
+     * @param status the status filter (optional)
+     * @param minPrice the minimum price filter (optional)
+     * @param minArea the minimum area filter (optional)
+     * @param type the type filter (optional)
+     * @param concept the concept filter (optional)
+     * @param page the page number (default is 0)
+     * @param size the page size (default is 6)
+     * @return a paginated list of public properties
+     * @see Page
+     */
     @GetMapping("/public")
-    @Operation(summary = "Get properties",
-            description = "Retrieves a paginated list of public properties based on filters.")
     public Page<?> getProperties(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Boolean status,
@@ -49,15 +66,27 @@ public class PropertyController {
             @RequestParam(required = false) String concept,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "6") Integer size
-            ) {
+    ) {
         Pageable pageable = PageRequest.of(page, size);
         return propertyService.getAll(name, status, minPrice, minArea, type, concept, pageable);
     }
 
+    /**
+     * Retrieves properties assigned to the authenticated agent with filters.
+     *
+     * @param name the name filter (optional)
+     * @param status the status filter (optional)
+     * @param minPrice the minimum price filter (optional)
+     * @param minArea the minimum area filter (optional)
+     * @param type the type filter (optional)
+     * @param concept the concept filter (optional)
+     * @param page the page number (default is 0)
+     * @param size the page size (default is 6)
+     * @return a paginated list of properties assigned to the authenticated agent
+     * @see Page
+     */
     @PreAuthorize("hasAuthority('AGENT')")
     @GetMapping("agent")
-    @Operation(summary = "Get properties by agent",
-            description = "Retrieves properties assigned to the authenticated agent with filters.")
     public Page<?> getPropertiesByAgentId(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Boolean status,
@@ -66,15 +95,28 @@ public class PropertyController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String concept,
             @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "6") Integer size) {
+            @RequestParam(defaultValue = "6") Integer size
+    ) {
         Pageable pageable = PageRequest.of(page, size);
         return propertyService.getAllByAgentId(name, status, minPrice, minArea, type, concept, pageable);
     }
 
+    /**
+     * Retrieves a list of properties that are not assigned to any agent.
+     *
+     * @param name the name filter (optional)
+     * @param status the status filter (optional)
+     * @param minPrice the minimum price filter (optional)
+     * @param minArea the minimum area filter (optional)
+     * @param type the type filter (optional)
+     * @param concept the concept filter (optional)
+     * @param page the page number (default is 0)
+     * @param size the page size (default is 6)
+     * @return a paginated list of properties without agents
+     * @see Page
+     */
     @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     @GetMapping("nulls")
-    @Operation(summary = "Get properties without agents",
-            description = "Retrieves a list of properties that are not assigned to any agent.")
     public Page<?> getPropertiesAgentIsNull(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Boolean status,
@@ -89,17 +131,29 @@ public class PropertyController {
         return propertyService.getAllByAgentIsNull(name, status, minPrice, minArea, type, concept, pageable);
     }
 
+    /**
+     * Retrieves a property by its ID.
+     *
+     * @param id the ID of the property
+     * @return the property details
+     * @see PropertyDTO
+     */
     @GetMapping("public/{id}")
-    @Operation(summary = "Get property by ID",
-            description = "Retrieves a property by its ID.")
     public PropertyDTO getPropertyById(@PathVariable Integer id) {
         return propertyService.getById(id);
     }
 
+    /**
+     * Creates a new property with the given details and images.
+     *
+     * @param images the list of property images
+     * @param request the property data
+     * @return the response entity containing the created property details
+     * @throws IOException if an I/O error occurs
+     * @see PropertyDTO
+     */
     @PreAuthorize("hasAuthority('AGENT')")
     @PostMapping
-    @Operation(summary = "Create a property",
-            description = "Creates a new property with the given details and images.")
     public ResponseEntity<PropertyDTO> saveProperty(
             @RequestParam("images") List<MultipartFile> images,
             @RequestPart("data") PropertyDTO request) throws IOException {
@@ -107,9 +161,15 @@ public class PropertyController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /**
+     * Updates an existing property by ID.
+     *
+     * @param id the ID of the property
+     * @param request the updated property data
+     * @return a message response indicating the update status
+     * @see MessageResponse
+     */
     @PutMapping("{id}")
-    @Operation(summary = "Update a property",
-            description = "Updates an existing property by ID.")
     public MessageResponse updateProperty(@PathVariable Integer id, @RequestBody PropertyDTO request) {
         propertyService.update(request, id);
         return new MessageResponse(
@@ -119,9 +179,15 @@ public class PropertyController {
         );
     }
 
+    /**
+     * Deletes a property by its ID.
+     *
+     * @param id the ID of the property
+     * @return a message response indicating the deletion status
+     * @throws IOException if an I/O error occurs
+     * @see MessageResponse
+     */
     @DeleteMapping("{id}")
-    @Operation(summary = "Delete a property",
-            description = "Deletes a property by its ID.")
     public MessageResponse deleteProperty(@PathVariable Integer id) throws IOException {
         propertyService.delete(id);
         return new MessageResponse(
@@ -131,10 +197,16 @@ public class PropertyController {
         );
     }
 
+    /**
+     * Assigns an agent to a property by their IDs.
+     *
+     * @param id the ID of the property
+     * @param agentId the ID of the agent
+     * @return a message response indicating the assignment status
+     * @see MessageResponse
+     */
     @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     @PutMapping("{id}/user/{agentId}")
-    @Operation(summary = "Assign an agent to a property",
-            description = "Assigns an agent to a property by their IDs.")
     public MessageResponse updateUserProperty(@PathVariable Integer id, @PathVariable Integer agentId) {
         propertyService.setAgent(id, agentId);
         return new MessageResponse(

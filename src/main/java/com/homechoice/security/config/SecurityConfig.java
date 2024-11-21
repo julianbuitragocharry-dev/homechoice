@@ -18,6 +18,9 @@ import java.util.List;
 /**
  * Security configuration class for setting up Spring Security in the application.
  * This class configures authentication, authorization, CORS, and JWT filter integration.
+ *
+ * @author Julian Enrique
+ * @since 1.0
  */
 @Configuration
 @RequiredArgsConstructor
@@ -52,10 +55,6 @@ public class SecurityConfig {
                     authRequests
                         .requestMatchers("api/auth/**").permitAll()
                         .requestMatchers("/api/*/public/**").permitAll()
-                            .requestMatchers("/v3/api-docs/**",
-                                    "/v3/api-docs.yaml",
-                                    "/swagger-ui/**",
-                                    "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager ->

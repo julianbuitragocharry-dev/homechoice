@@ -97,7 +97,6 @@ public class PropertyService {
         if (concept != null) { concept = "%" + concept + "%"; }
         Integer id = authService.getAuthenticatedUserId();
 
-
         return propertyRepository.findByAgentId(
                 name, status, minPrice, minArea, type, concept, id, pageable)
                 .map(this::toDTO);

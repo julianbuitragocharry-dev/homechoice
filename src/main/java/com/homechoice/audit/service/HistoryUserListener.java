@@ -16,6 +16,10 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+/**
+ * Listener class for capturing and logging changes to User entities.
+ * This class listens to entity lifecycle events and logs create, update, and delete actions.
+ */
 @Component
 @RequiredArgsConstructor(onConstructor_ = @__(@Lazy))
 public class HistoryUserListener {
@@ -23,21 +27,43 @@ public class HistoryUserListener {
     private final HistoryUserRepository historyUserRepository;
     private final UserService userService;
 
+    /**
+     * Logs the creation of a User entity.
+     *
+     * @param entity the User entity being created
+     */
     @PrePersist
     public void logCreate(User entity) {
         saveHistory(entity, "CREATE", entity);
     }
 
+    /**
+     * Logs the update of a User entity.
+     *
+     * @param entity the User entity being updated
+     */
     @PreUpdate
     public void logUpdate(User entity) {
         saveHistory(entity, "UPDATE", entity);
     }
 
+    /**
+     * Logs the deletion of a User entity.
+     *
+     * @param entity the User entity being deleted
+     */
     @PreRemove
     public void logDelete(User entity) {
         saveHistory(entity, "DELETE", null);
     }
 
+    /**
+     * Saves the history of changes made to a User entity.
+     *
+     * @param entity the User entity being changed
+     * @param action the action performed (CREATE, UPDATE, DELETE)
+     * @param newData the new data after the action
+     */
     private void saveHistory(User entity, String action, User newData) {
         try {
             Integer entityId = entity.getId();
@@ -57,6 +83,11 @@ public class HistoryUserListener {
         }
     }
 
+    /**
+     * Retrieves the current authenticated user.
+     *
+     * @return the username of the current authenticated user, or "SYSTEM" if no user is authenticated
+     */
     private String getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (authentication != null && authentication.isAuthenticated())
@@ -64,6 +95,12 @@ public class HistoryUserListener {
                 : "SYSTEM";
     }
 
+    /**
+     * Converts a User entity to a simple UserDTO.
+     *
+     * @param entity the User entity to convert
+     * @return the converted UserDTO, or null if the entity is null
+     */
     private UserDTO toSimple(User entity) {
         if (entity == null) {
             return null;
