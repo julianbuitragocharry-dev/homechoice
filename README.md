@@ -6,37 +6,63 @@ The backend service for the HomeChoice real estate management system. This servi
 - **PostgreSQL**: Relational database for data persistence.
 - **Spring Security**: For authentication and authorization.
 - **JWT (JSON Web Tokens)**: For secure token-based authentication.
-- **Swagger**: API documentation.
+- **JavaDocs**: For documentation.
 - **JPA/Hibernate**: For database access.
+
+## Model ER
+![HomeChoice ERD](src/main/resources/static/docs/homechoice_erd.png)
 
 ## Folder Structure
 ```
 src/
-└── main/
-    └── java/
-        └── com.homechoice/
-            ├── aws/                     // Module for AWS integrations (S3 Bucket).
-            ├── controller/              // Contains controllers (endpoints) that expose the API.
-            ├── dto/                     // Contains Data Transfer Objects, which are used for data transfer.
-            ├── exception                // Central exception interceptor.
-            ├── model/                   // Contains data model entities representing database tables.
-            ├── repository/              // Interfaces extending JpaRepository to interact with the database.
-            ├── security/                // Security module containing authentication and authorization configurations.
-            │   ├── auth/                // Classes related to authentication, such as the authentication controller.
-            │   ├── config/              // Security configurations, including CORS and authorization rules.
-            │   └── jwt/                 // Classes to handle JWT tokens, including generation and validation.
-            ├── service/                 // Contains the application's business logic.
-            └── HomechoiceApplication    // Main class that starts the Spring Boot application.      
-    └── resources/                       // Configuration files and static resources.
-        ├── application.yaml             // Main configuration file for Spring Boot.
-        └── import.sql                   // SQL file for initializing the database.
+ └── main/
+     ├── java/
+     │   └── com/
+     │       └── homechoice/
+     │           ├── audit/                         // Audit module for tracking changes.
+     │           │   ├── config/                    // Configuration classes for audit.
+     │           │   ├── model/                     // Entities for audit logging.
+     │           │   ├── repository/                // Interfaces for audit data access.
+     │           │   ├── service/                   // Services for handling audit logic.
+     │           │   └── util/                      // Utility classes for audit.
+     │           ├── aws/                           // AWS integrations (e.g., S3 Bucket).
+     │           ├── controller/                    // API controllers (endpoints).
+     │           │   ├── property/                  // Controllers for property-related endpoints.
+     │           │   │   └── auxiliary/             // Auxiliary controllers for property.
+     │           │   └── user/                      // Controllers for user-related endpoints.
+     │           │       └── auxiliary/             // Auxiliary controllers for user.
+     │           ├── dto/                           // Data Transfer Objects for data transfer.
+     │           │   ├── property/                  // DTOs related to properties.
+     │           │   └── user/                      // DTOs related to users.
+     │           ├── exception/                     // Central exception handling.
+     │           ├── model/                         // Data model entities (database tables).
+     │           │   ├── property/                  // Entities related to properties.
+     │           │   └── user/                      // Entities related to users.
+     │           ├── repository/                    // Database interaction interfaces (JpaRepository).
+     │           │   ├── property/                  // Repositories for property-related data.
+     │           │   └── user/                      // Repositories for user-related data.
+     │           ├── security/                      // Security configurations and authentication.
+     │           │   ├── auth/                      // Authentication-related classes.
+     │           │   ├── config/                    // Security configuration classes.
+     │           │   └── jwt/                       // JWT token handling classes.
+     │           └── service/                       // Business logic of the application.
+     │               ├── property/                  // Services for property-related logic.
+     │               │   └── auxiliary/             // Auxiliary services for property.
+     │               └── user/                      // Services for user-related logic.
+     │                   └── auxiliary/             // Auxiliary services for user.
+     └── resources/                                 // Configuration files and static resources.
+         └── static/
+             └── docs/
+                 └── javadoc/                       // Folder where Javadoc-generated documentation should be placed.
 ```
+> [!TIP]
+> To properly configure the environment variables, ensure you have a `.env` file located in the `resources` directory of your project. This file should contain all necessary environment-specific configurations for the application to function correctly.
 
-## API Documentation
-The API is documented with Swagger. After running the application, you can access the documentation at:
-```
-http://localhost:8080/swagger-ui.html
-```
+## Documentation
+The API is documented with Javadocs. To view the documentation, you need to compile the Javadocs and choose the output directory. Once compiled, you can access the documentation from the generated output directory in your browser.
+
+> [!WARNING]
+> Due to compilation issues with Javadocs, the annotation `@RequiredArgsConstructor(onConstructor_ = @__(@Lazy))` should be replaced with `@Lazy` explicitly.
 
 ## Contributing
 Contributions are welcome! Please follow these steps:
