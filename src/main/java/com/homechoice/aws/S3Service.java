@@ -15,6 +15,7 @@ import java.util.UUID;
 
 /**
  * Service for handling file operations with AWS S3.
+ * This service provides methods to upload and delete files in an S3 bucket.
  */
 @Service
 @RequiredArgsConstructor
@@ -24,12 +25,14 @@ public class S3Service {
 
     /**
      * AWS S3 Bucket name configured in application properties.
+     * This value is injected from the application properties.
      */
     @Value("${cloud-storage.bucket-name}")
     private String bucketName;
 
     /**
      * Uploads a single file to the configured S3 bucket.
+     * The file is uploaded with a unique name to avoid conflicts.
      *
      * @param file the {@link MultipartFile} to be uploaded.
      * @return the URL of the uploaded file.
@@ -49,12 +52,13 @@ public class S3Service {
 
             return "https://" + bucketName + ".s3.us-east-2.amazonaws.com/" + fileName.replace(" ", "%20");
         } catch (Exception e) {
-            throw new IOException("Error uploading file");
+            throw new IOException("Error uploading file", e);
         }
     }
 
     /**
      * Deletes a file from the configured S3 bucket based on the file URL.
+     * The file is identified by its URL and removed from the bucket.
      *
      * @param path the URL of the file to be deleted.
      * @throws IOException if an error occurs while deleting the file.
@@ -71,12 +75,13 @@ public class S3Service {
 
             s3Client.deleteObject(deleteObjectRequest);
         } catch (Exception e) {
-            throw new IOException("Error deleting file");
+            throw new IOException("Error deleting file", e);
         }
     }
 
     /**
      * Uploads multiple files to the configured S3 bucket.
+     * Each file is uploaded with a unique name to avoid conflicts.
      *
      * @param files a list of {@link MultipartFile} objects to be uploaded.
      * @return a list of URLs of the uploaded files.
@@ -93,6 +98,7 @@ public class S3Service {
 
     /**
      * Deletes multiple files from the configured S3 bucket.
+     * Each file is identified by its URL and removed from the bucket.
      *
      * @param paths a list of URLs of the files to be deleted.
      * @throws IOException if an error occurs while deleting any of the files.

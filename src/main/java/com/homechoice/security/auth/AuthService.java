@@ -4,7 +4,6 @@ import com.homechoice.model.user.User;
 import com.homechoice.repository.user.UserRepository;
 import com.homechoice.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;

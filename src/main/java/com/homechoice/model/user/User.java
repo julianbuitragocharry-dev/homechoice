@@ -2,7 +2,6 @@ package com.homechoice.model.user;
 
 import com.homechoice.audit.model.Auditable;
 import com.homechoice.audit.service.HistoryUserListener;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -26,6 +25,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Entity representing a user in the system with their personal information details.
+ */
 @Entity
 @EntityListeners(HistoryUserListener.class)
 @Data
@@ -33,52 +35,73 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @Builder
 @Table(name = "users")
-@Schema(description = "Represents a user in the system with their personal information details.")
 public class User extends Auditable<String> implements UserDetails {
 
+    /**
+     * Unique identifier for the user.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "Unique identifier for the user", example = "1")
     @Column(name = "user_id")
     private Integer id;
 
+    /**
+     * First name of the user.
+     */
     @Column(name = "use_first_name", length = 50)
-    @Schema(description = "First name of the user", example = "John")
     private String firstName;
 
+    /**
+     * Last name of the user.
+     */
     @Column(name = "use_last_name", length = 50)
-    @Schema(description = "Last name of the user", example = "Doe")
     private String lastName;
 
+    /**
+     * Phone number of the user.
+     */
     @Column(name = "use_phone", length = 25)
-    @Schema(description = "Phone number of the user", example = "301 5610 703")
     private String phone;
 
+    /**
+     * Address of the user.
+     */
     @Column(name = "use_address")
-    @Schema(description = "Address of the user", example = "Calle 13 #22-42, Neiva")
     private String address;
 
+    /**
+     * National Identification number of the user.
+     */
     @Column(name = "use_nit", length = 25, unique = true)
-    @Schema(description = "National Identification number of the user", example = "1077284243")
     private String nit;
 
+    /**
+     * Email address of the user.
+     */
     @Column(name = "use_email", length = 100, unique = true)
-    @Schema(description = "Email address of the user", example = "john.doe@example.com")
     private String email;
 
+    /**
+     * Password for the user account.
+     */
     @Column(name = "use_password")
-    @Schema(description = "Password for the user account", example = "password123")
     private String password;
 
+    /**
+     * Roles assigned to the user.
+     */
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "usr_use_id"),
             inverseJoinColumns = @JoinColumn(name = "usr_rol_id")
     )
-    @Schema(description = "Roles assigned to the user")
     private List<Rol> roles;
 
+    /**
+     * Returns the authorities granted to the user.
+     * @return a collection of granted authorities
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
@@ -86,26 +109,46 @@ public class User extends Auditable<String> implements UserDetails {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Returns the username used to authenticate the user.
+     * @return the email of the user
+     */
     @Override
     public String getUsername() {
         return email;
     }
 
+    /**
+     * Indicates whether the user's account has expired.
+     * @return true if the account is non-expired, false otherwise
+     */
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    /**
+     * Indicates whether the user is locked or unlocked.
+     * @return true if the account is non-locked, false otherwise
+     */
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    /**
+     * Indicates whether the user's credentials (password) has expired.
+     * @return true if the credentials are non-expired, false otherwise
+     */
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    /**
+     * Indicates whether the user is enabled or disabled.
+     * @return true if the user is enabled, false otherwise
+     */
     @Override
     public boolean isEnabled() {
         return true;

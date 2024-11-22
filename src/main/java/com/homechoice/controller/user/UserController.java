@@ -6,8 +6,6 @@ import com.homechoice.dto.user.UserDTO;
 import com.homechoice.dto.user.UserResponseDTO;
 import com.homechoice.dto.MessageResponse;
 import com.homechoice.service.user.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +25,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 
-@Tag(name = "User Management", description = "API for managing users and agents")
+/**
+ * Controller class for managing users and agents.
+ * This class provides endpoints for creating, updating, retrieving, and deleting users and agents.
+ *
+ * @see UserService
+ * @see UserDTO
+ * @see UserResponseDTO
+ * @see AgentDTO
+ * @see AgentResponseDTO
+ * @see MessageResponse
+ */
 @RestController
 @RequestMapping("api/users")
 @AllArgsConstructor
@@ -35,10 +43,17 @@ public class UserController {
 
     private final UserService userService;
 
+    /**
+     * Retrieves a paginated list of all users with optional NIT filter.
+     *
+     * @param nit the NIT filter (optional)
+     * @param page the page number (default is 0)
+     * @param size the page size (default is 6)
+     * @return a paginated list of users
+     * @see Page
+     */
     @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     @GetMapping
-    @Operation(summary = "Get all users",
-            description = "Retrieves a paginated list of all users with optional NIT filter.")
     public Page<?> getAllUsers(
         @RequestParam(required = false) String nit,
         @RequestParam(defaultValue = "0") Integer page,
@@ -48,27 +63,43 @@ public class UserController {
         return userService.getAllUsers(nit, pageable);
     }
 
+    /**
+     * Retrieves a user by their ID.
+     *
+     * @param id the ID of the user
+     * @return the user details
+     * @see UserDTO
+     */
     @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     @GetMapping("{id}")
-    @Operation(summary = "Get user by ID",
-            description = "Retrieves a user by their ID.")
     public UserDTO getUserById(@PathVariable Integer id) {
         return userService.getUserById(id);
     }
 
+    /**
+     * Creates a new user with the provided data.
+     *
+     * @param dto the user data
+     * @return the response entity containing the created user details
+     * @see UserResponseDTO
+     */
     @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     @PostMapping
-    @Operation(summary = "Create a new user",
-            description = "Creates a new user with the provided data.")
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserDTO dto) {
         UserResponseDTO response = userService.createUser(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /**
+     * Updates an existing user with the provided data by their ID.
+     *
+     * @param id the ID of the user
+     * @param request the updated user data
+     * @return a message response indicating the update status
+     * @see MessageResponse
+     */
     @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     @PutMapping("{id}")
-    @Operation(summary = "Update a user",
-            description = "Updates an existing user with the provided data by their ID.")
     public MessageResponse updateUser(@PathVariable Integer id, @RequestBody UserDTO request) {
         userService.updateUser(request, id);
         return new MessageResponse(
@@ -78,10 +109,15 @@ public class UserController {
         );
     }
 
+    /**
+     * Deletes a user by their ID.
+     *
+     * @param id the ID of the user
+     * @return a message response indicating the deletion status
+     * @see MessageResponse
+     */
     @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     @DeleteMapping("{id}")
-    @Operation(summary = "Delete a user",
-            description = "Deletes a user by their ID.")
     public MessageResponse deleteUser(@PathVariable Integer id) {
         userService.deleteUser(id);
         return new MessageResponse(
@@ -91,10 +127,17 @@ public class UserController {
         );
     }
 
+    /**
+     * Retrieves a paginated list of all agents with optional NIT filter.
+     *
+     * @param nit the NIT filter (optional)
+     * @param page the page number (default is 0)
+     * @param size the page size (default is 6)
+     * @return a paginated list of agents
+     * @see Page
+     */
     @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     @GetMapping("agents")
-    @Operation(summary = "Get all agents",
-            description = "Retrieves a paginated list of all agents with optional NIT filter.")
     public Page<?> getAllAgents(
             @RequestParam(required = false) String nit,
             @RequestParam(defaultValue = "0") Integer page,
@@ -104,26 +147,42 @@ public class UserController {
         return userService.getAllAgents(nit, pageable);
     }
 
+    /**
+     * Retrieves agent information by their ID.
+     *
+     * @param id the ID of the agent
+     * @return the agent details
+     * @see AgentResponseDTO
+     */
     @GetMapping("public/agents/{id}")
-    @Operation(summary = "Get agent by ID",
-            description = "Retrieves agent information by their ID.")
     public AgentResponseDTO getAgentById(@PathVariable Integer id) {
         return userService.getAgentById(id);
     }
 
+    /**
+     * Creates a new agent with the provided data.
+     *
+     * @param dto the agent data
+     * @return the response entity containing the created agent details
+     * @see UserResponseDTO
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("agents")
-    @Operation(summary = "Create a new agent",
-            description = "Creates a new agent with the provided data.")
     public ResponseEntity<UserResponseDTO> createAgent(@RequestBody AgentDTO dto) {
         UserResponseDTO response = userService.createAgent(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /**
+     * Updates an existing agent with the provided data by their ID.
+     *
+     * @param id the ID of the agent
+     * @param request the updated agent data
+     * @return a message response indicating the update status
+     * @see MessageResponse
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("agents/{id}")
-    @Operation(summary = "Update an agent",
-            description = "Updates an existing agent with the provided data by their ID.")
     public MessageResponse updateAgent(@PathVariable Integer id, @RequestBody AgentDTO request) {
         userService.updateAgent(request, id);
         return new MessageResponse(
@@ -133,10 +192,15 @@ public class UserController {
         );
     }
 
+    /**
+     * Deletes an agent by their ID.
+     *
+     * @param id the ID of the agent
+     * @return a message response indicating the deletion status
+     * @see MessageResponse
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("agents/{id}")
-    @Operation(summary = "Delete an agent",
-            description = "Deletes an agent by their ID.")
     public MessageResponse deleteAgent(@PathVariable Integer id) {
         userService.deleteAgent(id);
         return new MessageResponse(

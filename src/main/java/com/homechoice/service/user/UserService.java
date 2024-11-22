@@ -39,7 +39,7 @@ public class UserService {
 
     /**
      * Retrieves a paginated list of all users. Filters by NIT if provided.
-     * Only accessible by SUPER_ADMIN.
+     * Only accessible by SUPER\_ADMIN.
      *
      * @param nit the NIT filter (can be null)
      * @param pageable pagination details
@@ -53,7 +53,7 @@ public class UserService {
     }
 
     /**
-     * Retrieves a user by ID. Accessible by both ADMIN and SUPER_ADMIN.
+     * Retrieves a user by ID. Accessible by both ADMIN and SUPER\_ADMIN.
      *
      * @param id the ID of the user
      * @return UserDTO containing user information
@@ -64,7 +64,7 @@ public class UserService {
     }
 
     /**
-     * Creates a new user. Only accessible by SUPER_ADMIN.
+     * Creates a new user. Only accessible by SUPER\_ADMIN.
      *
      * @param dto UserDTO containing user details
      * @return UserResponseDTO of the created user
@@ -79,7 +79,7 @@ public class UserService {
 
     /**
      * Updates a user's information, including roles. Removes properties from
-     * the user if they lose the "AGENT" role. Only accessible by SUPER_ADMIN.
+     * the user if they lose the "AGENT" role. Only accessible by SUPER\_ADMIN.
      *
      * @param dto UserDTO with updated user information
      * @param id the ID of the user to update
@@ -113,7 +113,7 @@ public class UserService {
 
     /**
      * Deletes a user by ID. Removes their properties if they are assigned any.
-     * Only accessible by SUPER_ADMIN.
+     * Only accessible by SUPER\_ADMIN.
      *
      * @param id the ID of the user to delete
      */
