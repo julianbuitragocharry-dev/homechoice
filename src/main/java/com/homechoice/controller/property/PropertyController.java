@@ -180,6 +180,25 @@ public class PropertyController {
     }
 
     /**
+     * Freezes a property by its ID.
+     * This endpoint is accessible only to users with 'SUPER_ADMIN' or 'ADMIN' authority.
+     *
+     * @param id the ID of the property to be frozen
+     * @return a message response indicating the freeze status
+     * @see MessageResponse
+     */
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
+    @PutMapping("{id}/frozen")
+    public MessageResponse freezeProperty(@PathVariable Integer id) {
+        propertyService.freeze(id);
+        return new MessageResponse(
+                HttpStatus.OK.value(),
+                "Property successfully frozen",
+                LocalDateTime.now()
+        );
+    }
+
+    /**
      * Deletes a property by its ID.
      *
      * @param id the ID of the property

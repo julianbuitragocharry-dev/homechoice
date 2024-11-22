@@ -186,6 +186,19 @@ public class PropertyService {
     }
 
     /**
+     * Freezes a property by its ID.
+     * This method sets the agent of the property to null, effectively unassigning any agent from the property.
+     *
+     * @param id the ID of the property to be frozen
+     */
+    public void freeze(Integer id) {
+        Property property = findById(id);
+        property.setAgent(null);
+
+        propertyRepository.save(property);
+    }
+
+    /**
      * Deletes a property and its associated images from S3.
      *
      * @param id property ID
