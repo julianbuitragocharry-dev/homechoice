@@ -70,6 +70,11 @@ public class UserService {
      * @return UserResponseDTO of the created user
      */
     public UserResponseDTO createUser(UserDTO dto) {
+        List<String> filteredRoles = dto.getRoles().stream()
+                .filter(role -> !role.equalsIgnoreCase("SUPER_ADMIN"))
+                .collect(Collectors.toList());
+        dto.setRoles(filteredRoles);
+
         User user = toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
