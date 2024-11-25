@@ -177,6 +177,7 @@ public class PropertyService {
         property.setLatitude(dto.getLatitude());
         property.setLongitude(dto.getLongitude());
         property.setStatus(dto.getStatus());
+        property.setPrice(dto.getPrice());
         property.setDescription(dto.getDescription());
         property.setConcept(conceptService.getByConcept(dto.getConcept()));
         property.setType(typeService.getByType(dto.getType()));
